@@ -29,7 +29,6 @@
 
 #define PORT 8080
 #define RIP "192.168.1.35"
-#define FTBS 512 /* File transfer buffer size */
 
 static int verbose = 0;
 static int backup = 0;
@@ -39,8 +38,28 @@ static void print_usage(void)
 	printf("Usage goes here\n");
 }
 
+static void send_filetype(int sockfd, char ft)
+{
+	int rc, left;
+	char *type = &ft;
+
+	left = sizeof(ft);
+	do {
+		rc = write(sockfd, type, left);
+
+		if (rc < 0)
+			die("Error while sending filetype");
+		else
+			left -= rc;
+
+	} while (left > 0);
+}
+
 static int open_sock(unsigned int port, const char *ip)
 {
+	if (verbose)
+		v_log("Opening Socket...");
+
 	int sock;
 	struct sockaddr_in serv_addr;
 
@@ -71,7 +90,7 @@ static int file_to_skip(const char *filename)
 
 static void backup_file(const char *filename, const int sockfd)
 {
-	char BUFFER[FTBS];
+	char BUFFER[STD_BUFF_SZ];
 	FILE *fp;
 	struct stat filedata;
 
@@ -86,10 +105,8 @@ static void backup_file(const char *filename, const int sockfd)
 
 	/* Send the filename */
 	sprintf(BUFFER, "%s", filename);
-	write(sockfd, BUFFER, FTBS);
+	write(sockfd, BUFFER, STD_BUFF_SZ);
 
-	fread(BUFFER, 1, FTBS - 1, fp);
-	write(sockfd, BUFFER, FTBS);
 
 }
 
@@ -97,7 +114,6 @@ static void begin_backup(int sockfd)
 {
 	struct dirent *de;
 	DIR *dr;
-	char MODEBUF[32];
 
 	dr = opendir(".");
 
@@ -107,9 +123,10 @@ static void begin_backup(int sockfd)
 	while ((de = readdir(dr)) != NULL) {
 		if (file_to_skip(de->d_name)) {
 			if (de->d_type == DT_DIR) {
-				continue;
+				send_filetype(sockfd, 'D');
 				/* backup_dir(de->d_name, sockfd); */
 			} else {
+				send_filetype(sockfd, 'F');
 				backup_file(de->d_name, sockfd);
 			}
 		}

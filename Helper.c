@@ -1,5 +1,6 @@
 #include "Helper.h"
 
+/* Prints err to stdout and exits the program. */
 void die(const char *err, ...)
 {
 	va_list argp;
@@ -9,7 +10,6 @@ void die(const char *err, ...)
 	fputc('\n', stderr);
 	exit(1);
 }
-
 
 int strcmp(const char *p1, const char *p2)
 {
@@ -27,8 +27,19 @@ int strcmp(const char *p1, const char *p2)
 	return c2 - c1;
 }
 
+/* Zero out buffer (buf) of a given size (bufsize) */
 void zerobuf(char *buf, size_t bufsize)
 {
 	while (bufsize-- > 0)
 		*buf++ = '\0';
+}
+
+/* Verbose Logging. */
+void v_log(const char *msg, ...)
+{
+	va_list argp;
+	va_start(argp, msg);
+	vfprintf(stdout, msg, argp);
+	va_end(argp);
+	fputc('\n', stdout);
 }
