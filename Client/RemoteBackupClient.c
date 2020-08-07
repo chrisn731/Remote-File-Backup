@@ -26,6 +26,7 @@
 
 #include "RemoteBackupClient.h"
 #include "../Helper.h"
+#include "FileBackup.h"
 
 #define PORT 8080
 #define RIP "192.168.1.35"
@@ -38,30 +39,14 @@ static void print_usage(void)
 	printf("Usage goes here\n");
 }
 
-static void send_filetype(int sockfd, char ft)
-{
-	int rc, left;
-	char *type = &ft;
-
-	left = sizeof(ft);
-	do {
-		rc = write(sockfd, type, left);
-
-		if (rc < 0)
-			die("Error while sending filetype");
-		else
-			left -= rc;
-
-	} while (left > 0);
-}
 
 static int open_sock(unsigned int port, const char *ip)
 {
-	if (verbose)
-		v_log("Opening Socket...");
-
 	int sock;
 	struct sockaddr_in serv_addr;
+
+	if (verbose)
+		v_log("Opening Socket...");
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock < 0)
@@ -94,12 +79,15 @@ static void backup_file(const char *filename, const int sockfd)
 	FILE *fp;
 	struct stat filedata;
 
+
+	if (verbose)
+		v_log("Attempting to backup %s", filename);
+
 	stat(filename, &filedata);
 	fp = fopen(filename, "r");
 
 	if (!fp)
 		die("Error opening: %s", filename);
-
 
 	zerobuf(BUFFER, sizeof(BUFFER));
 
@@ -127,10 +115,16 @@ static void begin_backup(int sockfd)
 				/* backup_dir(de->d_name, sockfd); */
 			} else {
 				send_filetype(sockfd, 'F');
+
 				backup_file(de->d_name, sockfd);
 			}
 		}
 	}
+
+	/*
+	 * Once here, we need to send ~EOS~ so the server knows
+	 * we dont have anything else to send and it should stop listening.
+	 */
 
 	closedir(dr);
 }
