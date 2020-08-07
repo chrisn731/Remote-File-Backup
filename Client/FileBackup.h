@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include "../Helper.h"
 #include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
 void send_filetype(int sockfd, char ft);
 void send_filename(int sockfd, char *fn, size_t namelength);

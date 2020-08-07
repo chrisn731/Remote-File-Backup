@@ -45,7 +45,7 @@ void send_filename(int sockfd, char *filename, size_t namelength)
 
 void send_filemode(int sockfd, struct stat *st)
 {
-	int32_t conv;
+	int32_t conv = htonl(st->st_mode);
 	char *data = (char *) &conv;
 	int rc, left;
 
