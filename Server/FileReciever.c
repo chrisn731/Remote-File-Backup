@@ -1,21 +1,40 @@
 #include "FileReciever.h"
 
 
+void read_data(int sockfd, void *ptr, size_t amt, int op)
+{
+	int rc;
+	char *data = (char *) ptr;
+
+	do {
+		rc = read(sockfd, data, amt);
+
+		if (rc < 0) {
+			/*
+			 * if we end up here program will exit, so
+			 * breaks are not needed
+			 */
+			switch (op) {
+			case 1:
+				die("Error recieving filetype");
+			case 2:
+				die("Error recieving filename");
+			case 3:
+				die("Error recieving filemode");
+			case 4:
+				die("Error reading filecontent");
+			}
+		}
+
+		data += rc;
+		amt -= rc;
+
+	} while (amt > 0);
+}
+
 void recieve_filetype(int sockfd, char *ft)
 {
-	int rc, left;
-	char *type = ft;
-
-	left = sizeof(*type);
-	do {
-		rc = read(sockfd, type, left);
-
-		if (rc < 0)
-			die("Error while reading filetype");
-
-		type += rc;
-		left -= rc;
-	} while (left > 0);
+	read_data(sockfd, ft, sizeof(*ft), 1);
 }
 
 /*
@@ -24,41 +43,16 @@ void recieve_filetype(int sockfd, char *ft)
  */
 void recieve_filename(int sockfd, char *buffer)
 {
-	int rc, left;
-	char *data = buffer;
-
 	zerobuf(buffer, STD_BUFF_SZ);
-	left = STD_BUFF_SZ;
 
-	do {
-		rc = read(sockfd, data, left);
-
-		if (rc < 0)
-			die("Error reading filename");
-
-		data += rc;
-		left -= rc;
-	} while (left > 0);
-
+	read_data(sockfd, buffer, STD_BUFF_SZ, 2);
 }
 
 void recieve_filemode(int sockfd, struct stat *st)
 {
-	int rc, left;
 	int32_t conv;
-	char *data = (char *) &conv;
 
-	left = sizeof(mode_t);
-	do {
-		rc = read(sockfd, data, left);
-
-		if (rc < 0)
-			die("Error recieving filemode");
-
-		data += rc;
-		left -= rc;
-	} while (left > 0);
-
+	read_data(sockfd, &conv, sizeof(int32_t), 3);
 	st->st_mode = ntohl(conv);
 }
 
@@ -66,9 +60,8 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 {
 	char buffer[STD_BUFF_SZ];
 	FILE *fp;
-	int rc, left, readamt;
+	int readamt;
 	int32_t conv;
-	char *ptr;
 
 	fp = fopen(filename, "w");
 	if (!fp)
@@ -76,31 +69,10 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 
 	do {
 		zerobuf(buffer, STD_BUFF_SZ);
-		ptr = (char *) &conv;
-		left = sizeof(conv);
-		do {
-			rc = read(sockfd, ptr, left);
 
-			if (rc < 0)
-				die("Error while reading amount of bytes to read");
-
-			ptr += rc;
-			left -= rc;
-		} while (left > 0);
-
+		read_data(sockfd, &conv, sizeof(int32_t), 4);
 		readamt = ntohl(conv);
-		left = readamt;
-		ptr = buffer;
-
-		do {
-			rc = read(sockfd, ptr, left);
-
-			if (rc < 0)
-				die("Error while reading %s content", filename);
-
-			ptr += rc;
-			left -= rc;
-		} while (left > 0);
+		read_data(sockfd, buffer, readamt, 4);
 
 		fwrite(buffer, 1, readamt, fp);
 	} while (readamt == STD_BUFF_SZ);
