@@ -24,6 +24,8 @@
 #define PORT 8080
 #define NAMEBUFFER 256
 
+static int verbose = 0;
+
 static int begin_backup(int connfd)
 {
 

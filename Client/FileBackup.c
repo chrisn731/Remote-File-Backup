@@ -1,9 +1,5 @@
 #include "FileBackup.h"
 
-#define EOFSIZE 6
-#define EOSSIZE 6
-#define EOFMSG "~EOF~"
-#define EOSMSG "~EOS~"
 
 void send_filetype(int sockfd, char ft)
 {
@@ -24,13 +20,16 @@ void send_filetype(int sockfd, char ft)
 	} while (left > 0);
 }
 
-void send_filename(int sockfd, char *filename, size_t namelength)
+void send_filename(int sockfd, const char *filename, size_t namelength)
 {
 	int rc, left;
-	char *data = filename;
+	char buffer[STD_BUFF_SZ];
+	char *data = buffer;
 
-	left = namelength;
+	zerobuf(buffer, STD_BUFF_SZ);
+	sprintf(buffer, "%s", filename);
 
+	left = STD_BUFF_SZ;
 	do {
 		rc = write(sockfd, data, left);
 
@@ -45,9 +44,9 @@ void send_filename(int sockfd, char *filename, size_t namelength)
 
 void send_filemode(int sockfd, struct stat *st)
 {
+	int rc, left;
 	int32_t conv = htonl(st->st_mode);
 	char *data = (char *) &conv;
-	int rc, left;
 
 	left = sizeof(st->st_mode);
 	do {
@@ -63,10 +62,10 @@ void send_filemode(int sockfd, struct stat *st)
 
 }
 
-void send_message(int sockfd, char *msg, size_t msgsize)
+void send_message(int sockfd, const char *msg, size_t msgsize)
 {
 	int rc, left;
-	char *data = msg;
+	const char *data = msg;
 
 	left = msgsize;
 	do {
@@ -81,11 +80,11 @@ void send_message(int sockfd, char *msg, size_t msgsize)
 	} while (left > 0);
 }
 
-void send_filecontent(int sockfd, char *filename)
+void send_filecontent(int sockfd, const char *filename)
 {
 	FILE *fp = fopen(filename, "r");
 	char data;
-	char *byte;
+	char *ptr;
 	int rc, left;
 
 	if (!fp)
@@ -94,17 +93,19 @@ void send_filecontent(int sockfd, char *filename)
 
 	while ((data = fgetc(fp)) != EOF) {
 		left = sizeof(data);
+		ptr = &data;
 		do {
-			rc = write(sockfd, &data, left);
+			rc = write(sockfd, ptr, left);
 
 			if (rc < 0) {
 				die("Error sending filecontent of %s", filename);
 			} else {
-				data += rc;
+				ptr += rc;
 				left -= rc;
 			}
 		} while (left > 0);
 	}
 
 	send_message(sockfd, EOFMSG, EOFSIZE);
+	fclose(fp);
 }

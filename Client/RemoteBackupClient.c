@@ -75,26 +75,22 @@ static int file_to_skip(const char *filename)
 
 static void backup_file(const char *filename, const int sockfd)
 {
-	char BUFFER[STD_BUFF_SZ];
-	FILE *fp;
 	struct stat filedata;
-
 
 	if (verbose)
 		v_log("Attempting to backup %s", filename);
 
 	stat(filename, &filedata);
-	fp = fopen(filename, "r");
 
-	if (!fp)
-		die("Error opening: %s", filename);
+	send_filetype(sockfd, 'F');
 
-	zerobuf(BUFFER, sizeof(BUFFER));
+	send_filename(sockfd, filename, STD_BUFF_SZ);
 
-	/* Send the filename */
-	sprintf(BUFFER, "%s", filename);
-	write(sockfd, BUFFER, STD_BUFF_SZ);
+	send_filemode(sockfd, &filedata);
 
+	send_filecontent(sockfd, filename);
+
+	send_message(sockfd, EOFMSG, EOFSIZE);
 
 }
 
@@ -112,10 +108,9 @@ static void begin_backup(int sockfd)
 		if (file_to_skip(de->d_name)) {
 			if (de->d_type == DT_DIR) {
 				send_filetype(sockfd, 'D');
+				send_filename(sockfd, de->d_name, sizeof(de->d_name));
 				/* backup_dir(de->d_name, sockfd); */
 			} else {
-				send_filetype(sockfd, 'F');
-
 				backup_file(de->d_name, sockfd);
 			}
 		}
@@ -166,6 +161,8 @@ int main(int argc, char **argv)
 	}
 
 	sockfd = open_sock(PORT, RIP);
+
+	/* Initiate the backup here */
 
 	printf("Backup complete.\n");
 	close(sockfd);
