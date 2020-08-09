@@ -23,6 +23,8 @@ void read_data(int sockfd, void *ptr, size_t amt, int op)
 				die("Error recieving filemode");
 			case 4:
 				die("Error reading filecontent");
+			default:
+				die("Unknown error while reading data");
 			}
 		}
 
