@@ -12,6 +12,7 @@
 #define EOFMSG "~EOF~"
 #define EOSMSG "~EOS~"
 
+void send_data(int sockfd, void *data, size_t size, int op);
 void send_filetype(int sockfd, char ft);
 void send_filename(int sockfd, const char *fn, size_t namelength);
 void send_filemode(int sockfd, struct stat *st);
