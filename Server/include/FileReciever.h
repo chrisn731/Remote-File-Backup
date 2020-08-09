@@ -1,7 +1,7 @@
 #ifndef FILERECIEVER_H_G
 #define FILERECIEVER_H_G
 
-#include "../Helper.h"
+#include "../../Shared/Helper.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>

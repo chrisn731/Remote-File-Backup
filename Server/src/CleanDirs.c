@@ -1,4 +1,4 @@
-#include "CleanDirs.h"
+#include "../include/CleanDirs.h"
 
 
 /* For each file passed into this function, it will be deleted */

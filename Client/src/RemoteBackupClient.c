@@ -24,9 +24,9 @@
  * 3. Close connection.
  */
 
-#include "RemoteBackupClient.h"
-#include "../Helper.h"
-#include "FileBackup.h"
+#include "../include/RemoteBackupClient.h"
+#include "../../Shared/Helper.h"
+#include "../include/FileBackup.h"
 
 #define PORT 8080
 #define RIP "192.168.1.35"

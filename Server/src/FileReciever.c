@@ -1,4 +1,4 @@
-#include "FileReciever.h"
+#include "../include/FileReciever.h"
 
 
 void read_data(int sockfd, void *ptr, size_t amt, int op)

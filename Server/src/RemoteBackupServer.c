@@ -14,9 +14,9 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <stdarg.h>
-#include "CleanDirs.h"
+#include "../includeCleanDirs.h"
 #include "FileReciever.h"
-#include "../Helper.h"
+#include "../../Shared/Helper.h"
 
 
 #define PORT 8080
