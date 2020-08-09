@@ -14,8 +14,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <stdarg.h>
-#include "../includeCleanDirs.h"
-#include "FileReciever.h"
+#include "../include/CleanDirs.h"
+#include "../include/FileReciever.h"
 #include "../../Shared/Helper.h"
 
 
@@ -136,7 +136,26 @@ static int purge_dir(void)
 int main(int argc, char **argv)
 {
 	int serverfd, connfd;
+	char *arg;
 
+	while ((arg = argv[1]) != NULL) {
+		if (*arg != '-')
+			break;
+		for (;;) {
+			switch (*++arg) {
+			case 'b':
+				continue;
+			case 'v':
+				verbose = 1;
+				continue;
+			case 0:
+			default:
+				break;
+			}
+			break;
+		}
+		argv++;
+	}
 	open_sock("127.0.0.1", &serverfd, &connfd);
 
 	printf("Finished opening socket and connection established,\
@@ -146,7 +165,7 @@ int main(int argc, char **argv)
 
 	/* At this point we have a clean directory ready for files */
 
-
+	/* being_backup(connfd); */
 
 
 	close(connfd);

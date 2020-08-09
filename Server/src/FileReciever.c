@@ -1,7 +1,7 @@
 #include "../include/FileReciever.h"
 
 
-void read_data(int sockfd, void *ptr, size_t amt, int op)
+static void read_data(int sockfd, void *ptr, size_t amt, int op)
 {
 	int rc;
 	char *data = (char *) ptr;
@@ -74,6 +74,10 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 
 		read_data(sockfd, &conv, sizeof(int32_t), 4);
 		readamt = ntohl(conv);
+
+		if (!readamt)
+			break;
+
 		read_data(sockfd, buffer, readamt, 4);
 
 		fwrite(buffer, 1, readamt, fp);

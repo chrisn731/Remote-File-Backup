@@ -67,13 +67,16 @@ void send_filecontent(int sockfd, const char *filename)
 		read = fread(data, 1, STD_BUFF_SZ, fp);
 
 		if (feof(fp))
-			goto finish;
+			read = 0;
 
 		conv = htonl(read);
 		ptr = (char *) &conv;
 
 		/* Send how much data is to be read */
 		send_data(sockfd, ptr, sizeof(conv), 4);
+
+		if (!read)
+			break;
 
 		ptr = data;
 
@@ -82,7 +85,5 @@ void send_filecontent(int sockfd, const char *filename)
 
 	} while (read == STD_BUFF_SZ);
 
-finish:
-	send_message(sockfd, EOFMSG, EOFSIZE);
 	fclose(fp);
 }

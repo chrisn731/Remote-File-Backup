@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+static void read_data(int sockfd, void *ptr, size_t amt, int op);
 void recieve_filetype(int sockfd, char *ft);
 void recieve_filename(int sockfd, char *buffer);
 void recieve_filemode(int sockfd, struct stat *st);
