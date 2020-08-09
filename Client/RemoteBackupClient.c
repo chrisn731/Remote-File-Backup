@@ -31,7 +31,6 @@
 #define PORT 8080
 #define RIP "192.168.1.35"
 
-static int verbose = 0;
 static int backup = 0;
 
 static void print_usage(void)

@@ -22,8 +22,6 @@
 #define PORT 8080
 #define DIR_NAME_BUF_SIZE 128
 
-static int verbose = 0;
-
 /* Kick off function for backing up. */
 static int begin_backup(int connfd)
 {
@@ -38,6 +36,7 @@ static int begin_backup(int connfd)
 		switch (state) {
 		case 'D':
 			recieve_filename(connfd, buffer);
+			v_log("Recieved dir: %s", buffer);
 			mkdir(buffer, 0755);
 			chdir(buffer);
 			/* Do some shit for dir making */
@@ -46,6 +45,7 @@ static int begin_backup(int connfd)
 		case 'F':
 			/* Do some shit for file making */
 			recieve_filename(connfd, buffer);
+			v_log("Recieved file: %s", buffer);
 			recieve_filemode(connfd, &st);
 			recieve_filecontent(connfd, buffer, &st);
 			continue;

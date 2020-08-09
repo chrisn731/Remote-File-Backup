@@ -4,8 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 #define STD_BUFF_SZ 512
+
+static int verbose = 0;
 
 void die(const char *err, ...);
 int strcmp(const char *, const char *);

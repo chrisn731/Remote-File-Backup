@@ -5,8 +5,7 @@
 #define _XOPEN_SOURCE 500
 
 #include <ftw.h>
-#include <unistd.h>
-#include <stdio.h>
+#include "../Helper.h"
 
 static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
 int CleanDirectory(const char *path);
