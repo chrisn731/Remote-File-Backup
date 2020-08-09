@@ -89,9 +89,6 @@ static void backup_file(const char *filename, const int sockfd)
 	send_filemode(sockfd, &filedata);
 
 	send_filecontent(sockfd, filename);
-
-	send_message(sockfd, EOFMSG, EOFSIZE);
-
 }
 
 static void begin_backup(int sockfd)
@@ -109,7 +106,7 @@ static void begin_backup(int sockfd)
 			if (de->d_type == DT_DIR) {
 				send_filetype(sockfd, 'D');
 				send_filename(sockfd, de->d_name, sizeof(de->d_name));
-				/* backup_dir(de->d_name, sockfd); */
+				/* Switch dir */
 			} else {
 				backup_file(de->d_name, sockfd);
 			}

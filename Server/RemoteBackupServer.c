@@ -7,8 +7,6 @@
  *    from client and create files / dirs.
  * 4. Close connection.
  */
-#include <stdio.h>
-#include <stdlib.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -17,44 +15,48 @@
 #include <dirent.h>
 #include <stdarg.h>
 #include "CleanDirs.h"
-#include "FileMaker.h"
+#include "FileReciever.h"
 #include "../Helper.h"
 
 
 #define PORT 8080
-#define NAMEBUFFER 256
+#define DIR_NAME_BUF_SIZE 128
 
 static int verbose = 0;
 
+/* Kick off function for backing up. */
 static int begin_backup(int connfd)
 {
 
-	char currdir[NAMEBUFFER] = {'.', '/'};
+	char buffer[STD_BUFF_SZ];
 	char state;
-	int rc, left;
+	struct stat st;
 
 	for (;;) {
-		left = sizeof(state);
-
-		do {
-			rc = read(connfd, &state, left);
-
-			if (rc < 0)
-				die("Read error in backup phase.");
-			else
-				left -=	rc;
-
-		} while (left > 0);
+		recieve_filetype(connfd, &state);
 
 		switch (state) {
 		case 'D':
+			recieve_filename(connfd, buffer);
+			mkdir(buffer, 0755);
+			chdir(buffer);
 			/* Do some shit for dir making */
 			continue;
 
 		case 'F':
 			/* Do some shit for file making */
+			recieve_filename(connfd, buffer);
+			recieve_filemode(connfd, &st);
+			recieve_filecontent(connfd, buffer, &st);
 			continue;
-		case 'E':
+
+		case 'R':
+			chdir("..");
+			continue;
+
+		case 'E': /* Fallthrough */
+		case 0:
+		default:
 			break;
 		}
 		break;

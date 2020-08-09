@@ -96,6 +96,10 @@ void send_filecontent(int sockfd, const char *filename)
 	do {
 		zerobuf(data, STD_BUFF_SZ);
 		read = fread(data, 1, STD_BUFF_SZ, fp);
+
+		if (read == 0)
+			goto finish;
+
 		left = sizeof(conv);
 		conv = htonl(read);
 		ptr = (char *) &conv;
@@ -129,6 +133,7 @@ void send_filecontent(int sockfd, const char *filename)
 
 	} while (read == STD_BUFF_SZ);
 
+finish:
 	send_message(sockfd, EOFMSG, EOFSIZE);
 	fclose(fp);
 }
