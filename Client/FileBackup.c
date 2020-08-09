@@ -97,7 +97,7 @@ void send_filecontent(int sockfd, const char *filename)
 		zerobuf(data, STD_BUFF_SZ);
 		read = fread(data, 1, STD_BUFF_SZ, fp);
 
-		if (read == 0)
+		if (feof(fp))
 			goto finish;
 
 		left = sizeof(conv);

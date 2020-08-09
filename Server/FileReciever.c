@@ -102,7 +102,7 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 			left -= rc;
 		} while (left > 0);
 
-		fputs(buffer, fp);
+		fwrite(buffer, 1, readamt, fp);
 	} while (readamt == STD_BUFF_SZ);
 
 	fclose(fp);
