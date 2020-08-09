@@ -82,29 +82,52 @@ void send_message(int sockfd, const char *msg, size_t msgsize)
 
 void send_filecontent(int sockfd, const char *filename)
 {
-	FILE *fp = fopen(filename, "r");
-	char data;
+	FILE *fp;
+	char data[STD_BUFF_SZ];
 	char *ptr;
-	int rc, left;
+	int32_t conv;
+	int rc, read, left;
 
+
+	fp = fopen(filename, "r");
 	if (!fp)
 		die("Error reading from: %s", filename);
 
+	do {
+		zerobuf(data, STD_BUFF_SZ);
+		read = fread(data, 1, STD_BUFF_SZ, fp);
+		left = sizeof(conv);
+		conv = htonl(read);
+		ptr = (char *) &conv;
 
-	while ((data = fgetc(fp)) != EOF) {
-		left = sizeof(data);
-		ptr = &data;
+		/* Send how much data is to be read */
 		do {
 			rc = write(sockfd, ptr, left);
 
-			if (rc < 0) {
-				die("Error sending filecontent of %s", filename);
-			} else {
-				ptr += rc;
-				left -= rc;
-			}
+			if (rc < 0)
+				die("Error sending filecontent size for %s", filename);
+
+			ptr += rc;
+			left -= rc;
 		} while (left > 0);
-	}
+
+		left = read;
+		ptr = data;
+
+		/* Send the data */
+		do {
+			rc = write(sockfd, ptr, left);
+
+			if (rc < 0)
+				die("Error writing content for %s", filename);
+
+			ptr += rc;
+			left -= rc;
+
+		} while (left > 0);
+
+
+	} while (read == STD_BUFF_SZ);
 
 	send_message(sockfd, EOFMSG, EOFSIZE);
 	fclose(fp);
