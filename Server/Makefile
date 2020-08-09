@@ -1,13 +1,19 @@
+CC 	= gcc
+CFLAGS 	= -c -Wall
 
+server: RemoteBackupServer.o CleanDirs.o FileReciever.o
+	gcc RemoteBackupServer.o CleanDirs.o FileReciever.o -o RemoteBackupServer
 
-server: RemoteBackupServer.o CleanDirs.o
-	gcc RemoteBackupServer.o CleanDirs.o -o RemoteBackupServer
+RemoteBackupServer.o: RemoteBackupServer.c
+	$(CC) $(CFLAGS) RemoteBackupServer.c
 
-RemoteBackupServer.o:
-	gcc -c RemoteBackupServer.c
+CleanDirs.o: CleanDirs.c
+	$(CC) $(CFLAGS) CleanDirs.c
 
-CleanDirs.o:
-	gcc -c CleanDirs.c
+FileReciever.o: FileReciever.c
+	$(CC) $(CFLAGS) FileReciever.c
 
 clean:
 	rm *.o
+
+.PHONY: all server
