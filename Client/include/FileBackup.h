@@ -17,13 +17,10 @@ extern int verbose;
 
 void send_data(int sockfd, void *data, size_t size, int op);
 void send_filetype(int sockfd, char ft);
-void send_filename(int sockfd, const char *fn, size_t namelength);
+void send_filename(int sockfd, const char *fn);
 void send_filemode(int sockfd, struct stat *st);
 void send_message(int sockfd, const char *msg, size_t msgsize);
 void send_filecontent(int sockfd, const char *filename);
-
-
-
 
 
 #endif /* FILEBACKUP_H_G */

@@ -31,7 +31,7 @@ void send_filetype(int sockfd, char ft)
 	send_data(sockfd, &ft, sizeof(ft), 1);
 }
 
-void send_filename(int sockfd, const char *filename, size_t namelength)
+void send_filename(int sockfd, const char *filename)
 {
 	char buffer[STD_BUFF_SZ];
 
