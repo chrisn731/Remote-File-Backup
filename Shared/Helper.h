@@ -8,7 +8,7 @@
 
 #define STD_BUFF_SZ 512
 
-static int verbose = 0;
+extern int verbose;
 
 void die(const char *err, ...);
 int strcmp(const char *, const char *);

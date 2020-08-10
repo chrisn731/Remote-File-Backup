@@ -32,6 +32,7 @@
 #define RIP "192.168.1.35"
 
 static int backup = 0;
+int verbose = 0;
 
 static void print_usage(void)
 {
@@ -124,6 +125,8 @@ int main(int argc, char **argv)
 {
 	char *arg;
 	int sockfd;
+
+	verbose = 0;
 
 	if (argc < 2) {
 		/* Usage will go here */

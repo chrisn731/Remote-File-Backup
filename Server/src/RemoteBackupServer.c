@@ -22,6 +22,8 @@
 #define PORT 8080
 #define DIR_NAME_BUF_SIZE 128
 
+int verbose = 0;
+
 /* Kick off function for backing up. */
 static int begin_backup(int connfd)
 {

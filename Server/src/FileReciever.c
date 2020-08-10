@@ -1,6 +1,5 @@
 #include "../include/FileReciever.h"
 
-
 static void read_data(int sockfd, void *ptr, size_t amt, int op)
 {
 	int rc;

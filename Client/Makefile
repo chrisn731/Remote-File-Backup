@@ -1,22 +1,24 @@
-SRC_DIR := src
-INC_DIR := include
-OBJ 	:= obj
-SRC 	:= $(wildcard $(SRC_DIR)/*.c)
-OBJS 	:= $(patsubst $(SRC)/%.c,$(OBJ)/%.o,$(SRC))
-EXE 	:= RBClient
 CC 	:= gcc
-CFLAGS 	:= -Wall -c
+CFLAGS 	:= -Wall
+SRC_DIR := ./src
+OBJ_DIR := ./obj
+SRCS 	:= $(wildcard $(SRC_DIR)/*.c)
+HELPERC := ../Shared/Helper.c
+OBJS 	:= $(patsubst $(SRC)/%.c,$(OBJ)/%.o,$(SRCS))
+EXE 	:= RBClient
 
 .PHONY: all clean
 
 all: $(EXE)
 
-$(EXE): $(OBJS)
+$(EXE): $(OBJS) $(OBJ_DIR)/Helper.o
 	$(CC) $^ -o $@
 
-$(OBJ)/%.o: $(SRC)/%.c
+$(OBJ)/%.o: $(SRC)/%.c | ($OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/Helper.o: $(HELPERC)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm $(OBJS)/*.o
-
+	rm $(OBJ)/*.o

@@ -7,6 +7,8 @@
 #include <ftw.h>
 #include "../../Shared/Helper.h"
 
+extern int verbose;
+
 static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
 int CleanDirectory(const char *path);
 
