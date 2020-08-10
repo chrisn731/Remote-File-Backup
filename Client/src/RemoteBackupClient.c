@@ -56,8 +56,12 @@ static int open_sock(unsigned int port, const char *ip)
 	serv_addr.sin_port = htons(port);
 	serv_addr.sin_addr.s_addr = inet_addr(RIP);
 
-	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-		die("Connection Failed.");
+	if (verbose)
+		v_log("Attempting to connect to server");
+
+	while (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+		sleep(2);
+
 
 	return sock;
 }
@@ -79,6 +83,7 @@ static void backup_file(const char *filename, const int sockfd)
 
 	if (verbose)
 		v_log("Attempting to backup %s", filename);
+
 
 	stat(filename, &filedata);
 
