@@ -6,7 +6,7 @@ static int unlink_cb(const char *fpath, const struct stat *sb,
 		     int typeflag, struct FTW *ftwbuf)
 {
 	if (verbose)
-		printf("Attempting to remove: %s\n", fpath);
+		v_log("Attempting to remove: %s", fpath);
 
 	return remove(fpath);
 }
@@ -17,6 +17,9 @@ static int unlink_cb(const char *fpath, const struct stat *sb,
  */
 int CleanDirectory(const char *path)
 {
+	if (verbose)
+		v_log("Attempting to delete dir: %s", path);
+
 	nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 
 	return 0;

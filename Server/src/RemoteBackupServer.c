@@ -112,9 +112,7 @@ static int purge_dir(void)
 	struct dirent *de;
 	DIR *dr;
 
-	dr = opendir(".");
-
-	if (!dr)
+	if (!(dr = opendir(".")))
 		die("Could not open current directory.");
 
 	while ((de = readdir(dr)) != NULL) {
@@ -156,10 +154,13 @@ int main(int argc, char **argv)
 		}
 		argv++;
 	}
+	if (verbose)
+		v_log("Opening socket.");
+
 	open_sock("127.0.0.1", &serverfd, &connfd);
 
-	printf("Finished opening socket and connection established,\
-		preparing directory...\n");
+	v_log("Finished opening socket and connection established,\
+		preparing directory...");
 
 	purge_dir();
 

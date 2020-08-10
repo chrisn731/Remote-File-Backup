@@ -1,14 +1,22 @@
-SRC_DIR = src
-HDR_DIR = include
-SRC 	= $(wildcard $(SRC_DIR)/*.c)
+SRC_DIR := src
+INC_DIR := include
+OBJ 	:= obj
+SRC 	:= $(wildcard $(SRC_DIR)/*.c)
+OBJS 	:= $(patsubst $(SRC)/%.c,$(OBJ)/%.o,$(SRC))
+EXE 	:= RBClient
+CC 	:= gcc
+CFLAGS 	:= -Wall -c
 
-all: RemoteBackupClient.o
-	gcc -Wall RemoteBackupClient.o -o RemoteBackupClient
+.PHONY: all clean
 
-RemoteBackupClient.o: RemoteBackupClient.c
-	gcc -c RemoteBackupClient.c
+all: $(EXE)
+
+$(EXE): $(OBJS)
+	$(CC) $^ -o $@
+
+$(OBJ)/%.o: $(SRC)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm *.o
+	rm $(OBJS)/*.o
 
-.PHONY: all

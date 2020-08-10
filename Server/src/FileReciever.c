@@ -65,8 +65,7 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 	int readamt;
 	int32_t conv;
 
-	fp = fopen(filename, "w");
-	if (!fp)
+	if (!(fp = fopen(filename, "w")))
 		die("Error opening %s to write to", filename);
 
 	do {

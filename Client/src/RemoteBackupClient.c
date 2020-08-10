@@ -65,7 +65,7 @@ static int open_sock(unsigned int port, const char *ip)
  * Function to skip certain filenames while parsing directory.
  * Returns 0 if it is a file to skip, != 0 otherwise.
  */
-static int file_to_skip(const char *filename)
+static int can_delete(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
@@ -101,7 +101,7 @@ static void begin_backup(int sockfd)
 		die("Could not open current directory.");
 
 	while ((de = readdir(dr)) != NULL) {
-		if (file_to_skip(de->d_name)) {
+		if (can_delete(de->d_name)) {
 			if (de->d_type == DT_DIR) {
 				send_filetype(sockfd, 'D');
 				send_filename(sockfd, de->d_name, sizeof(de->d_name));
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
 
 	while ((arg = argv[1]) != NULL) {
 		if (*arg != '-')
-			die("Error caught unknown flag.");
+			die("Error caught unknown flag: %s", arg);
 
 		for (;;) {
 			switch (*++arg) {
