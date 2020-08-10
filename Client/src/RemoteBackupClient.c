@@ -4,12 +4,14 @@
  * Any other use is undefined behavior.
  */
 
+
 /*
  * TODO:
  * 1. Figure out how to efficiently pass file name
  *    through server & data file contains & cut off code #EOF#
  * FUTURE: Make server multi-thread capable
  */
+
 
 /* Current plan:
  * 1. Have server clean its directory.
@@ -32,121 +34,135 @@
 static int backup = 0;
 int verbose = 0;
 
-static void print_usage(void) { printf("Usage goes here\n"); }
+static void print_usage(void)
+{
+	printf("Usage goes here\n");
+}
 
-static int open_sock(unsigned int port, const char *ip) {
-  int sock;
-  struct sockaddr_in serv_addr;
 
-  if (verbose)
-    v_log("Opening Socket...");
+static int open_sock(unsigned int port, const char *ip)
+{
+	int sock;
+	struct sockaddr_in serv_addr;
 
-  sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock < 0)
-    die("Socket Creation error.");
+	if (verbose)
+		v_log("Opening Socket...");
 
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(port);
-  serv_addr.sin_addr.s_addr = inet_addr(RIP);
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock < 0)
+		die("Socket Creation error.");
 
-  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    die("Connection Failed.");
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(port);
+	serv_addr.sin_addr.s_addr = inet_addr(RIP);
 
-  return sock;
+	if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+		die("Connection Failed.");
+
+	return sock;
 }
 
 /*
  * Function to skip certain filenames while parsing directory.
  * Returns 0 if it is a file to skip, != 0 otherwise.
  */
-static int dont_skip(const char *filename) {
-  return (strcmp(filename, ".") && strcmp(filename, "..") &&
-          strcmp(filename, "ts3server.pid"));
+static int dont_skip(const char *filename)
+{
+	return (strcmp(filename, ".") &&
+		strcmp(filename, "..") &&
+		strcmp(filename, "ts3server.pid"));
 }
 
-static void backup_file(const char *filename, const int sockfd) {
-  struct stat filedata;
+static void backup_file(const char *filename, const int sockfd)
+{
+	struct stat filedata;
 
-  if (verbose)
-    v_log("Attempting to backup %s", filename);
+	if (verbose)
+		v_log("Attempting to backup %s", filename);
 
-  stat(filename, &filedata);
+	stat(filename, &filedata);
 
-  send_filetype(sockfd, 'F');
-  send_filename(sockfd, filename);
-  send_filemode(sockfd, &filedata);
-  send_filecontent(sockfd, filename);
+	send_filetype(sockfd, 'F');
+	send_filename(sockfd, filename);
+	send_filemode(sockfd, &filedata);
+	send_filecontent(sockfd, filename);
 }
 
-static void backup_dir(int sockfd, const char *path) {
-  struct dirent *de;
-  DIR *dr;
+static void backup_dir(int sockfd, const char *path)
+{
+	struct dirent *de;
+	DIR *dr;
 
-  if (!(dr = opendir(path)))
-    die("Could not open directory: %s", path);
+	if (!(dr = opendir(path)))
+		die("Could not open directory: %s", path);
 
-  while ((de = readdir(dr)) != NULL) {
-    if (dont_skip(de->d_name)) {
-      if (de->d_type == DT_DIR) {
-        send_filetype(sockfd, 'D');
-        send_filename(sockfd, de->d_name);
-        backup_dir(sockfd, de->d_name);
-        send_filetype(sockfd, 'R');
-      } else {
-        backup_file(de->d_name, sockfd);
-      }
-    }
-  }
+	while ((de = readdir(dr)) != NULL) {
+		if (dont_skip(de->d_name)) {
+			if (de->d_type == DT_DIR) {
+				send_filetype(sockfd, 'D');
+				send_filename(sockfd, de->d_name);
+				backup_dir(sockfd, de->d_name);
+				send_filetype(sockfd, 'R');
+			} else {
+				backup_file(de->d_name, sockfd);
+			}
+		}
+	}
 }
 
-/* Kick off function to being backing up. */
-static void begin_backup(int sockfd, const char *path) {
-  backup_dir(sockfd, ".");
+static void begin_backup(int sockfd, const char *path)
+{
+	/* Begin backup with the directory that the program is in */
+	backup_dir(sockfd, ".");
 
-  /* Send E so server knows we are done */
-  send_filetype(sockfd, 'E');
+	/* Send 'E'nd to the server to tell it to stop. */
+	send_filetype(sockfd, 'E');
 }
 
-int main(int argc, char **argv) {
-  char *arg;
-  int sockfd;
+int main(int argc, char **argv)
+{
+	char *arg;
+	int sockfd;
 
-  if (argc < 2) {
-    /* Usage will go here */
-    print_usage();
-    return 1;
-  }
+	verbose = 0;
 
-  while ((arg = argv[1]) != NULL) {
-    if (*arg != '-')
-      die("Error caught unknown flag: %s", arg);
+	if (argc < 2) {
+		/* Usage will go here */
+		print_usage();
+		return 1;
+	}
 
-    for (;;) {
-      switch (*++arg) {
-      case 'b':
-      case 'B':
-        /* backup shit */
-        backup = 1;
-        continue;
+	while ((arg = argv[1]) != NULL) {
+		if (*arg != '-')
+			die("Error caught unknown flag: %s", arg);
 
-      case 'v':
-        verbose = 1;
-        continue;
-      case 0:
-        break;
-      default:
-        break;
-      }
-      break;
-    }
-    argv++;
-  }
+		for (;;) {
+			switch (*++arg) {
+			case 'b':
+			case 'B':
+				/* backup shit */
+				backup = 1;
+				continue;
 
-  sockfd = open_sock(PORT, RIP);
+			case 'v':
+				verbose = 1;
+				continue;
+			case 0:
+				break;
+			default:
+				break;
+			}
+			break;
+		}
+		argv++;
+	}
 
-  /* Initiate the backup here */
+	sockfd = open_sock(PORT, RIP);
 
-  printf("Backup complete.\n");
-  close(sockfd);
-  return 0;
+	/* Initiate the backup here */
+
+	printf("Backup complete.\n");
+	close(sockfd);
+	return 0;
+
 }
