@@ -33,7 +33,11 @@ void send_filetype(int sockfd, char ft)
 
 void send_filename(int sockfd, const char *filename, size_t namelength)
 {
-	send_data(sockfd, (void *) filename, STD_BUFF_SZ, 2);
+	char buffer[STD_BUFF_SZ];
+
+	zerobuf(buffer, STD_BUFF_SZ);
+	sprintf(buffer, "%s", filename);
+	send_data(sockfd, (void *) buffer, STD_BUFF_SZ, 2);
 }
 
 void send_filemode(int sockfd, struct stat *st)

@@ -66,7 +66,7 @@ static int open_sock(unsigned int port, const char *ip)
  * Function to skip certain filenames while parsing directory.
  * Returns 0 if it is a file to skip, != 0 otherwise.
  */
-static int can_delete(const char *filename)
+static int dont_skip(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
@@ -83,29 +83,47 @@ static void backup_file(const char *filename, const int sockfd)
 	stat(filename, &filedata);
 
 	send_filetype(sockfd, 'F');
-
 	send_filename(sockfd, filename, STD_BUFF_SZ);
-
 	send_filemode(sockfd, &filedata);
-
 	send_filecontent(sockfd, filename);
 }
 
-static void begin_backup(int sockfd)
+static void backup_dir(int sockfd, const char *path)
 {
 	struct dirent *de;
 	DIR *dr;
 
-	dr = opendir(".");
-
-	if (!dr)
-		die("Could not open current directory.");
+	if (!(dr = opendir(path)))
+		die("Could not open directory: %s", path);
 
 	while ((de = readdir(dr)) != NULL) {
-		if (can_delete(de->d_name)) {
+		if (dont_skip(de->d_name)) {
 			if (de->d_type == DT_DIR) {
 				send_filetype(sockfd, 'D');
 				send_filename(sockfd, de->d_name, sizeof(de->d_name));
+				backup_dir(sockfd, de->d_name);
+			} else {
+				backup_file(de->d_name, sockfd);
+			}
+		}
+	}
+	send_filetype(sockfd, 'R');
+}
+
+static void begin_backup(int sockfd, const char *path)
+{
+	struct dirent *de;
+	DIR *dr;
+
+	if (!(dr = opendir(".")))
+		die("Could not open current directory.");
+
+	while ((de = readdir(dr)) != NULL) {
+		if (dont_skip(de->d_name)) {
+			if (de->d_type == DT_DIR) {
+				send_filetype(sockfd, 'D');
+				send_filename(sockfd, de->d_name, sizeof(de->d_name));
+				backup_dir(sockfd, de->d_name);
 				/* Switch dir */
 			} else {
 				backup_file(de->d_name, sockfd);
@@ -113,11 +131,7 @@ static void begin_backup(int sockfd)
 		}
 	}
 
-	/*
-	 * Once here, we need to send ~EOS~ so the server knows
-	 * we dont have anything else to send and it should stop listening.
-	 */
-
+	send_filetype(sockfd, 'E');
 	closedir(dr);
 }
 

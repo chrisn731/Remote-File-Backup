@@ -161,8 +161,9 @@ int main(int argc, char **argv)
 
 	open_sock("127.0.0.1", &serverfd, &connfd);
 
-	v_log("Finished opening socket and connection established,\
-		preparing directory...");
+	if (verbose)
+		v_log("Finished opening socket and connection established,\
+			preparing directory...");
 
 	purge_dir();
 
