@@ -5,7 +5,7 @@ static void read_data(int sockfd, void *ptr, size_t amt, int op)
 	int rc;
 	char *data = (char *) ptr;
 
-	if (amt <= 0)
+	if (!amt)
 		return;
 
 	do {

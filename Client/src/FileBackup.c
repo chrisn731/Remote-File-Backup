@@ -6,7 +6,7 @@ static void send_data(int sockfd, void *data, size_t amt, int op)
 	int rc;
 	char *byte = data;
 
-	if (amt <= 0)
+	if (!amt)
 		return;
 
 	do {
