@@ -1,5 +1,5 @@
 CC 	:= gcc
-CFLAGS 	:= -Wall
+CFLAGS 	:= -Wall -Werror
 SRC_DIR := ./src
 OBJ_DIR := ./obj
 SRCS 	:= $(wildcard $(SRC_DIR)/*.c)
@@ -22,3 +22,7 @@ $(OBJ_DIR)/Helper.o: $(HELPERC)
 
 clean:
 	rm $(OBJ)/*.o
+
+
+quick: src/FileBackup.c src/RemoteBackupClient.c ../Shared/Helper.c
+	$(CC) $(CFLAGS) $^ -o $(EXE)

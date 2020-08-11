@@ -1,3 +1,0 @@
-1. Finish regulations of string sizes sent to "send_filename"
-
-2. Finish directory recursion.

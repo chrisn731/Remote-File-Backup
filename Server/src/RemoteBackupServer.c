@@ -105,7 +105,7 @@ static int dont_delete_pls(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
-		strcmp(filename, "RemoteBackupServer"));
+		strcmp(filename, "RBServer"));
 }
 
 static int purge_dir(void)
@@ -176,8 +176,7 @@ int main(int argc, char **argv)
 
 	/* At this point we have a clean directory ready for files */
 
-	/* being_backup(connfd); */
-
+	begin_backup(connfd);
 
 	if (verbose)
 		v_log("Finished backup. Cleaning up...");

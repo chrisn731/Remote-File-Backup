@@ -5,6 +5,9 @@ static void read_data(int sockfd, void *ptr, size_t amt, int op)
 	int rc;
 	char *data = (char *) ptr;
 
+	if (amt <= 0)
+		return;
+
 	do {
 		rc = read(sockfd, data, amt);
 
@@ -72,9 +75,6 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 
 		read_data(sockfd, &conv, sizeof(int32_t), 4);
 		readamt = ntohl(conv);
-
-		if (!readamt)
-			break;
 
 		read_data(sockfd, buffer, readamt, 4);
 

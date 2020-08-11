@@ -1,5 +1,5 @@
 CC 	= gcc
-CFLAGS 	= -c -Wall
+CFLAGS 	= -Wall -Werror
 
 server: RemoteBackupServer.o CleanDirs.o FileReciever.o
 	gcc RemoteBackupServer.o CleanDirs.o FileReciever.o -o RemoteBackupServer
@@ -15,5 +15,8 @@ FileReciever.o: FileReciever.c
 
 clean:
 	rm *.o
+
+quick: src/CleanDirs.c src/FileReciever.c src/RemoteBackupServer.c ../Shared/Helper.c
+	$(CC) $(CFLAGS) $^ -o RBServer
 
 .PHONY: all server

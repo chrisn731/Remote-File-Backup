@@ -1,13 +1,16 @@
 #include "../include/FileBackup.h"
 
 
-void send_data(int sockfd, void *data, size_t amt, int op)
+static void send_data(int sockfd, void *data, size_t amt, int op)
 {
 	int rc;
 	char *byte = data;
 
+	if (amt <= 0)
+		return;
+
 	do {
-		rc = write(sockfd, data, amt);
+		rc = write(sockfd, byte, amt);
 
 		if (rc < 0) {
 			switch (op) {
@@ -20,7 +23,7 @@ void send_data(int sockfd, void *data, size_t amt, int op)
 			}
 		}
 
-		data += rc;
+		byte += rc;
 		amt -= rc;
 
 	} while (amt > 0);
@@ -57,35 +60,23 @@ void send_filecontent(int sockfd, const char *filename)
 {
 	FILE *fp;
 	char data[STD_BUFF_SZ];
-	char *ptr;
 	int32_t conv;
-	int rc, read, left;
+	int read;
 
-
-	fp = fopen(filename, "r");
-	if (!fp)
+	if (!(fp = fopen(filename, "r")))
 		die("Error reading from: %s", filename);
 
 	do {
 		zerobuf(data, STD_BUFF_SZ);
 		read = fread(data, 1, STD_BUFF_SZ, fp);
 
-		if (feof(fp))
-			read = 0;
-
 		conv = htonl(read);
-		ptr = (char *) &conv;
 
 		/* Send how much data is to be read */
-		send_data(sockfd, ptr, sizeof(conv), 4);
-
-		if (!read)
-			break;
-
-		ptr = data;
+		send_data(sockfd, &conv, sizeof(conv), 4);
 
 		/* Send the data */
-		send_data(sockfd, ptr, read, 4);
+		send_data(sockfd, data, read, 4);
 
 	} while (read == STD_BUFF_SZ);
 

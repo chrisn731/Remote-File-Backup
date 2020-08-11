@@ -7,15 +7,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define EOFSIZE 6
-#define EOSSIZE 6
-#define EOFMSG "~EOF~"
-#define EOSMSG "~EOS~"
-
-
 extern int verbose;
 
-extern void send_data(int sockfd, void *data, size_t size, int op);
 extern void send_filetype(int sockfd, char ft);
 extern void send_filename(int sockfd, const char *fn);
 extern void send_filemode(int sockfd, struct stat *st);

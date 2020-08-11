@@ -59,6 +59,7 @@ static int open_sock(unsigned int port, const char *ip)
 	if (verbose)
 		v_log("Attempting to connect to server");
 
+	/* Keep trying to connect until connection is made */
 	while (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 		sleep(2);
 
@@ -77,6 +78,7 @@ static int dont_skip(const char *filename)
 		strcmp(filename, "ts3server.pid"));
 }
 
+/* Backs up a singular file */
 static void backup_file(const char *filename, const int sockfd)
 {
 	struct stat filedata;
@@ -93,6 +95,7 @@ static void backup_file(const char *filename, const int sockfd)
 	send_filecontent(sockfd, filename);
 }
 
+/* Backs up a whole directory */
 static void backup_dir(int sockfd, const char *path)
 {
 	struct dirent *de;
@@ -101,6 +104,9 @@ static void backup_dir(int sockfd, const char *path)
 	if (!(dr = opendir(path)))
 		die("Could not open directory: %s", path);
 
+	if (chdir(path))
+		die("Error: Failed to change into directory: %s", path);
+
 	while ((de = readdir(dr)) != NULL) {
 		if (dont_skip(de->d_name)) {
 			if (de->d_type == DT_DIR) {
@@ -108,6 +114,7 @@ static void backup_dir(int sockfd, const char *path)
 				send_filename(sockfd, de->d_name);
 				backup_dir(sockfd, de->d_name);
 				send_filetype(sockfd, 'R');
+				chdir("..");
 			} else {
 				backup_file(de->d_name, sockfd);
 			}
@@ -115,6 +122,7 @@ static void backup_dir(int sockfd, const char *path)
 	}
 }
 
+/* Kick off function for backing up a given directory */
 static void begin_backup(int sockfd, const char *path)
 {
 	/* Begin backup with the directory that the program is in */
@@ -164,7 +172,7 @@ int main(int argc, char **argv)
 
 	sockfd = open_sock(PORT, RIP);
 
-	/* Initiate the backup here */
+	begin_backup(sockfd, ".");
 
 	printf("Backup complete.\n");
 	close(sockfd);
