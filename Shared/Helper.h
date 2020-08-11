@@ -10,10 +10,10 @@
 
 extern int verbose;
 
-void die(const char *err, ...);
-int strcmp(const char *, const char *);
-void zerobuf(char *buf, size_t bufsize);
-void v_log(const char *msg, ...);
+extern void die(const char *err, ...);
+extern int strcmp(const char *, const char *);
+extern void zerobuf(char *buf, size_t bufsize);
+extern void v_log(const char *msg, ...);
 
 
 #endif /* HELPER_H_G */

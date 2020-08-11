@@ -57,13 +57,13 @@ static int begin_backup(int connfd)
 			continue;
 
 		case 'E': /* Fallthrough */
+			v_log("End of stream character recieved. Closing...");
 		case 0:
 		default:
 			break;
 		}
 		break;
 	}
-
 	return 0;
 }
 
@@ -110,12 +110,14 @@ static int dont_delete_pls(const char *filename)
 
 static int purge_dir(void)
 {
-
 	struct dirent *de;
 	DIR *dr;
 
 	if (!(dr = opendir(".")))
 		die("Could not open current directory.");
+
+	if (verbose)
+		v_log("Purging Directory");
 
 	while ((de = readdir(dr)) != NULL) {
 		if (dont_delete_pls(de->d_name)) {
@@ -156,6 +158,7 @@ int main(int argc, char **argv)
 		}
 		argv++;
 	}
+
 	if (verbose)
 		v_log("Opening socket.");
 
@@ -165,14 +168,25 @@ int main(int argc, char **argv)
 		v_log("Finished opening socket and connection established,\
 			preparing directory...");
 
+
 	purge_dir();
+
+	if (verbose)
+		v_log("Finished Cleaning. Starting backup");
 
 	/* At this point we have a clean directory ready for files */
 
 	/* being_backup(connfd); */
 
 
+	if (verbose)
+		v_log("Finished backup. Cleaning up...");
+
 	close(connfd);
 	close(serverfd);
+
+	if (verbose)
+		v_log("Done.");
+
 	return 0;
 }
