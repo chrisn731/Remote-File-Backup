@@ -13,16 +13,20 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <stdarg.h>
 #include "../include/CleanDirs.h"
 #include "../include/FileReciever.h"
 #include "../../Shared/Helper.h"
 
-
-#define PORT 8080
-#define DIR_NAME_BUF_SIZE 128
-
+static int backup = 0;
 int verbose = 0;
+
+static void print_usage(void)
+{
+	printf("Error Incorrect Usage:\n"
+		"./RBServer [-v] [-b]\n"
+		"-v\tTurn on verbose\n"
+		"-b\tDo a backup\n");
+}
 
 /* Kick off function for backing up. */
 static int begin_backup(int connfd)
@@ -140,12 +144,18 @@ int main(int argc, char **argv)
 	int serverfd, connfd;
 	char *arg;
 
+	if (argc < 2) {
+		print_usage();
+		return 1;
+	}
+
 	while ((arg = argv[1]) != NULL) {
 		if (*arg != '-')
 			break;
 		for (;;) {
 			switch (*++arg) {
 			case 'b':
+				backup = 1;
 				continue;
 			case 'v':
 				verbose = 1;
@@ -159,14 +169,19 @@ int main(int argc, char **argv)
 		argv++;
 	}
 
+	if (!backup) {
+		print_usage();
+		return 1;
+	}
+
 	if (verbose)
 		v_log("Opening socket.");
 
 	open_sock("127.0.0.1", &serverfd, &connfd);
 
 	if (verbose)
-		v_log("Finished opening socket and connection established,\
-			preparing directory...");
+		v_log("Finished opening socket and connection established,"
+			"preparing directory...");
 
 
 	purge_dir();

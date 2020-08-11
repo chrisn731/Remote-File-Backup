@@ -9,11 +9,11 @@
 
 extern int verbose;
 
-extern void send_filetype(int sockfd, char ft);
-extern void send_filename(int sockfd, const char *fn);
-extern void send_filemode(int sockfd, struct stat *st);
-extern void send_message(int sockfd, const char *msg, size_t msgsize);
 extern void send_filecontent(int sockfd, const char *filename);
+extern void send_filemode(int sockfd, struct stat *st);
+extern void send_filename(int sockfd, const char *fn);
+extern void send_filetype(int sockfd, char ft);
+extern void send_message(int sockfd, const char *msg, size_t msgsize);
 
 
 #endif /* FILEBACKUP_H_G */

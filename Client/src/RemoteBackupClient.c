@@ -28,7 +28,6 @@
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
 
-#define PORT 8080
 #define RIP "192.168.1.35"
 
 static int backup = 0;
@@ -36,7 +35,10 @@ int verbose = 0;
 
 static void print_usage(void)
 {
-	printf("Usage goes here\n");
+	printf("Error Incorrect Usage:\n"
+		"./RBClient [-v] [-b]\n"
+		"-v\tTurn on verbose\n"
+		"-b\tDo a backup\n");
 }
 
 
@@ -62,7 +64,6 @@ static int open_sock(unsigned int port, const char *ip)
 	/* Keep trying to connect until connection is made */
 	while (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 		sleep(2);
-
 
 	return sock;
 }
@@ -137,8 +138,6 @@ int main(int argc, char **argv)
 	char *arg;
 	int sockfd;
 
-	verbose = 0;
-
 	if (argc < 2) {
 		/* Usage will go here */
 		print_usage();
@@ -168,6 +167,11 @@ int main(int argc, char **argv)
 			break;
 		}
 		argv++;
+	}
+
+	if (!backup) {
+		print_usage();
+		return 1;
 	}
 
 	sockfd = open_sock(PORT, RIP);
