@@ -28,7 +28,14 @@ static void print_usage(void)
 		"-b\tDo a backup\n");
 }
 
-/* Kick off function for backing up. */
+/*
+ * Kick off function for backing up. Recieves an action from a client,
+ * and performs some action based on it.
+ * F: Incoming file.
+ * D: Incoming directory, create dir and chdir into it.
+ * R: Return to parent directory.
+ * E: End of data stream.
+ */
 static int begin_backup(int connfd)
 {
 
@@ -37,7 +44,7 @@ static int begin_backup(int connfd)
 	struct stat st;
 
 	for (;;) {
-		recieve_filetype(connfd, &state);
+		recieve_action(connfd, &state);
 
 		switch (state) {
 		case 'D':
@@ -60,8 +67,9 @@ static int begin_backup(int connfd)
 			chdir("..");
 			continue;
 
-		case 'E': /* Fallthrough */
+		case 'E':
 			v_log("End of stream character recieved. Closing...");
+			break;
 		case 0:
 		default:
 			break;

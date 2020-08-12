@@ -36,7 +36,7 @@ static void read_data(int sockfd, void *ptr, size_t amt, int op)
 	} while (amt > 0);
 }
 
-void recieve_filetype(int sockfd, char *ft)
+void recieve_action(int sockfd, char *ft)
 {
 	read_data(sockfd, ft, sizeof(*ft), 1);
 }

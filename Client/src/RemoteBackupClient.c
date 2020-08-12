@@ -76,13 +76,20 @@ static void backup_file(const char *filename, const int sockfd)
 
 	stat(filename, &filedata);
 
-	send_filetype(sockfd, 'F');
+	send_action(sockfd, 'F');
 	send_filename(sockfd, filename);
 	send_filemode(sockfd, &filedata);
 	send_filecontent(sockfd, filename);
 }
 
-/* Backs up a whole directory */
+/*
+ * Backs up a whole directory and sends actions to server based
+ * on the types of files in the directory. Types of actions are:
+ * F: Incoming file.
+ * D: Incoming Directory, create and recurse into it.
+ * R: Return to previous directory.
+ * E: End of data stream.
+ */
 static void backup_dir(int sockfd, const char *path)
 {
 	struct dirent *de;
@@ -97,10 +104,10 @@ static void backup_dir(int sockfd, const char *path)
 	while ((de = readdir(dr)) != NULL) {
 		if (dont_skip(de->d_name)) {
 			if (de->d_type == DT_DIR) {
-				send_filetype(sockfd, 'D');
+				send_action(sockfd, 'D');
 				send_filename(sockfd, de->d_name);
 				backup_dir(sockfd, de->d_name);
-				send_filetype(sockfd, 'R');
+				send_action(sockfd, 'R');
 				chdir("..");
 			} else {
 				backup_file(de->d_name, sockfd);
@@ -116,7 +123,7 @@ static void begin_backup(int sockfd, const char *path)
 	backup_dir(sockfd, ".");
 
 	/* Send 'E'nd to the server to tell it to stop. */
-	send_filetype(sockfd, 'E');
+	send_action(sockfd, 'E');
 }
 
 int main(int argc, char **argv)

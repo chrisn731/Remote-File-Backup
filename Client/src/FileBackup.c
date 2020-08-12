@@ -1,6 +1,6 @@
 #include "../include/FileBackup.h"
 
-
+/* Send data through socket. */
 static void send_data(int sockfd, void *data, size_t amt, int op)
 {
 	int rc;
@@ -29,11 +29,13 @@ static void send_data(int sockfd, void *data, size_t amt, int op)
 	} while (amt > 0);
 }
 
-void send_filetype(int sockfd, char ft)
+/* Sends actions to server to perform. */
+void send_action(int sockfd, char ft)
 {
 	send_data(sockfd, &ft, sizeof(ft), 1);
 }
 
+/* Send filename to server */
 void send_filename(int sockfd, const char *filename)
 {
 	char buffer[STD_BUFF_SZ];
@@ -43,6 +45,7 @@ void send_filename(int sockfd, const char *filename)
 	send_data(sockfd, (void *) buffer, STD_BUFF_SZ, 2);
 }
 
+/* Send filemode to server */
 void send_filemode(int sockfd, struct stat *st)
 {
 	int32_t conv;
@@ -51,11 +54,13 @@ void send_filemode(int sockfd, struct stat *st)
 	send_data(sockfd, &conv, sizeof(int32_t), 3);
 }
 
+/* Send arbitrary messsage to the server */
 void send_message(int sockfd, const char *msg, size_t msgsize)
 {
 	send_data(sockfd, (void *) msg, msgsize, 0);
 }
 
+/* Open a file and send the contents of it to server */
 void send_filecontent(int sockfd, const char *filename)
 {
 	FILE *fp;
