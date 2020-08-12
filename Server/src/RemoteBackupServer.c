@@ -17,6 +17,9 @@
 #include "../include/FileReciever.h"
 #include "../../Shared/Helper.h"
 
+/* Used to make sure we dont delete the process during directory cleaning. */
+#define PROG_NAME "RBServer"
+
 static int backup = 0;
 int verbose = 0;
 
@@ -68,7 +71,7 @@ static int begin_backup(int connfd)
 			continue;
 
 		case 'E':
-			v_log("End of stream character recieved. Closing...");
+			v_log("End of stream action recieved. Closing up...");
 			break;
 		case 0:
 		default:
@@ -117,7 +120,7 @@ static int dont_delete_pls(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
-		strcmp(filename, "RBServer"));
+		strcmp(filename, PROG_NAME));
 }
 
 static int purge_dir(void)
@@ -190,7 +193,6 @@ int main(int argc, char **argv)
 	if (verbose)
 		v_log("Finished opening socket and connection established,"
 			"preparing directory...");
-
 
 	purge_dir();
 
