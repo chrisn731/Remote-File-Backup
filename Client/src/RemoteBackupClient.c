@@ -1,27 +1,13 @@
 /*
  * Create a network socket and send files through. Similar to scp.
- * This is to be used EXCLUSIVELY with the Teamspeak Server directory.
- * Any other use is undefined behavior.
+ * One benefit of this over scp is that it will recursively send all
+ * types of files through a socket.
  */
 
 
 /*
  * TODO:
- * 1. Figure out how to efficiently pass file name
- *    through server & data file contains & cut off code #EOF#
  * FUTURE: Make server multi-thread capable
- */
-
-
-/* Current plan:
- * 1. Have server clean its directory.
- * 	a. CleanDirs.c should take care of this.
- * 2. Have client read its files and send them through.
- * 	a. Still need to figure out how we will transfer the name,
- * 	   file contents, and closing each file.
- * 	b. Need to figure out how server will create a directory and
- * 	   store files at certain places.
- * 3. Close connection.
  */
 
 #include "../include/RemoteBackupClient.h"
