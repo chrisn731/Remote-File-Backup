@@ -3,7 +3,7 @@
 static void read_data(int sockfd, void *ptr, size_t amt, int op)
 {
 	int rc;
-	char *data = (char *) ptr;
+	char *data = ptr;
 
 	if (!amt)
 		return;
@@ -48,7 +48,6 @@ void recieve_action(int sockfd, char *ft)
 void recieve_filename(int sockfd, char *buffer)
 {
 	zerobuf(buffer, STD_BUFF_SZ);
-
 	read_data(sockfd, buffer, STD_BUFF_SZ, 2);
 }
 

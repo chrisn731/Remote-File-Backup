@@ -5,10 +5,15 @@
 static int unlink_cb(const char *fpath, const struct stat *sb,
 		     int typeflag, struct FTW *ftwbuf)
 {
+	int rv;
+
 	if (verbose)
 		v_log("Attempting to remove: %s", fpath);
 
-	return remove(fpath);
+	if ((rv = remove(fpath)))
+		die("Error removing: %s", fpath);
+
+	return rv;
 }
 
 /*
