@@ -1,6 +1,13 @@
 #include "../include/FileReciever.h"
 
-static void read_data(int sockfd, void *ptr, size_t amt, int op)
+enum operation {
+	R_ACTION = 0,
+	R_FNAME,
+	R_FMODE,
+	R_FCONT,
+};
+
+static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 {
 	int rc;
 	char *data = ptr;
@@ -10,35 +17,32 @@ static void read_data(int sockfd, void *ptr, size_t amt, int op)
 
 	do {
 		rc = read(sockfd, data, amt);
-
 		if (rc < 0) {
 			/*
 			 * if we end up here program will exit, so
 			 * breaks are not needed
 			 */
 			switch (op) {
-			case 1:
-				die("Error recieving filetype");
-			case 2:
+			case R_ACTION:
+				die("Error recieving action");
+			case R_FNAME:
 				die("Error recieving filename");
-			case 3:
+			case R_FMODE:
 				die("Error recieving filemode");
-			case 4:
+			case R_FCONT:
 				die("Error reading filecontent");
 			default:
 				die("Unknown error while reading data");
 			}
 		}
-
 		data += rc;
 		amt -= rc;
-
 	} while (amt > 0);
 }
 
 void recieve_action(int sockfd, char *ft)
 {
-	read_data(sockfd, ft, sizeof(*ft), 1);
+	read_data(sockfd, ft, sizeof(*ft), R_ACTION);
 }
 
 /*
@@ -48,14 +52,14 @@ void recieve_action(int sockfd, char *ft)
 void recieve_filename(int sockfd, char *buffer)
 {
 	zerobuf(buffer, STD_BUFF_SZ);
-	read_data(sockfd, buffer, STD_BUFF_SZ, 2);
+	read_data(sockfd, buffer, STD_BUFF_SZ, R_FNAME);
 }
 
 void recieve_filemode(int sockfd, struct stat *st)
 {
 	int32_t conv;
 
-	read_data(sockfd, &conv, sizeof(int32_t), 3);
+	read_data(sockfd, &conv, sizeof(int32_t), R_FMODE);
 	st->st_mode = ntohl(conv);
 }
 
@@ -72,12 +76,12 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 	do {
 		zerobuf(buffer, STD_BUFF_SZ);
 
-		read_data(sockfd, &conv, sizeof(int32_t), 4);
+		read_data(sockfd, &conv, sizeof(int32_t), R_FCONT);
+
 		readamt = ntohl(conv);
+		read_data(sockfd, buffer, readamt, R_FCONT);
 
-		read_data(sockfd, buffer, readamt, 4);
-
-		fwrite(buffer, 1, readamt, fp);
+		fwrite(buffer, sizeof(char), readamt, fp);
 	} while (readamt == STD_BUFF_SZ);
 
 	fclose(fp);
