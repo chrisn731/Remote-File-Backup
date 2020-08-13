@@ -43,7 +43,7 @@ static void send_data(int sockfd, void *data, size_t amt, enum operation op)
 /* Sends actions to server to perform. */
 void send_action(int sockfd, char ft)
 {
-	send_data(sockfd, &ft, sizeof(ft), 1);
+	send_data(sockfd, &ft, sizeof(ft), S_ACTN);
 }
 
 /* Send filename to server */
@@ -53,7 +53,7 @@ void send_filename(int sockfd, const char *filename)
 
 	zerobuf(buffer, STD_BUFF_SZ);
 	sprintf(buffer, "%s", filename);
-	send_data(sockfd, (void *) buffer, STD_BUFF_SZ, 2);
+	send_data(sockfd, (void *) buffer, STD_BUFF_SZ, S_FNAME);
 }
 
 /* Send filemode to server */
@@ -62,13 +62,13 @@ void send_filemode(int sockfd, struct stat *st)
 	int32_t conv;
 
 	conv = htonl(st->st_mode);
-	send_data(sockfd, &conv, sizeof(int32_t), 3);
+	send_data(sockfd, &conv, sizeof(int32_t), S_FMODE);
 }
 
 /* Send arbitrary messsage to the server */
 void send_message(int sockfd, const char *msg, size_t msgsize)
 {
-	send_data(sockfd, (void *) msg, msgsize, 0);
+	send_data(sockfd, (void *) msg, msgsize, S_MESSG);
 }
 
 /* Open a file and send the contents of it to server */
@@ -88,10 +88,10 @@ void send_filecontent(int sockfd, const char *filename)
 
 		/* Send how much data is to be read */
 		conv = htonl(read);
-		send_data(sockfd, &conv, sizeof(conv), 4);
+		send_data(sockfd, &conv, sizeof(conv), S_FCONT);
 
 		/* Send the data */
-		send_data(sockfd, data, read, 4);
+		send_data(sockfd, data, read, S_FCONT);
 
 	} while (read == STD_BUFF_SZ);
 
