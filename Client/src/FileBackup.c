@@ -1,7 +1,15 @@
 #include "../include/FileBackup.h"
 
+enum operation {
+	S_ACTN = 0,
+	S_FNAME,
+	S_FMODE,
+	S_MESSG,
+	S_FCONT,
+};
+
 /* Send data through socket. */
-static void send_data(int sockfd, void *data, size_t amt, int op)
+static void send_data(int sockfd, void *data, size_t amt, enum operation op)
 {
 	int rc;
 	char *byte = data;
@@ -11,21 +19,24 @@ static void send_data(int sockfd, void *data, size_t amt, int op)
 
 	do {
 		rc = write(sockfd, byte, amt);
-
 		if (rc < 0) {
 			switch (op) {
-			case 1:
-			case 2:
-			case 3:
-			case 4:
+			case S_ACTN:
+				die("Error while sending action");
+			case S_FNAME:
+				die("Error while sending filename");
+			case S_FMODE:
+				die("Error while sending filemode");
+			case S_MESSG:
+				die("Error while sending message");
+			case S_FCONT:
+				die("Error while sending file content");
 			default:
-				die("Error");
+				die("Fatal unknown error");;
 			}
 		}
-
 		byte += rc;
 		amt -= rc;
-
 	} while (amt > 0);
 }
 
@@ -75,9 +86,8 @@ void send_filecontent(int sockfd, const char *filename)
 		zerobuf(data, STD_BUFF_SZ);
 		read = fread(data, 1, STD_BUFF_SZ, fp);
 
-		conv = htonl(read);
-
 		/* Send how much data is to be read */
+		conv = htonl(read);
 		send_data(sockfd, &conv, sizeof(conv), 4);
 
 		/* Send the data */
