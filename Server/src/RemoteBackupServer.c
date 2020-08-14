@@ -177,7 +177,7 @@ int main(int argc, char **argv)
 				verbose = 1;
 				continue;
 			case '-':
-				if (!strcmp("ip", arg))
+				if (!strcmp("-ip", arg))
 					IP = *++argv;
 				break;
 			case 0:
