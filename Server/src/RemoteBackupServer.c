@@ -20,15 +20,17 @@
 /* Used to make sure we dont delete the process during directory cleaning. */
 #define PROG_NAME "RBServer"
 
+static char *IP = "127.0.0.1";
 static int backup = 0;
 int verbose = 0;
 
 static void print_usage(void)
 {
 	printf("Error Incorrect Usage:\n"
-		"./RBServer [-v] [-b]\n"
-		"-v\tTurn on verbose\n"
-		"-b\tDo a backup\n");
+		"./RBServer [-v/V] [-b/B] [--ip {IP}]\n"
+		"-v/V\tTurn on verbose\n"
+		"-b/B\tDo a backup\n"
+		"--ip\tSet ip of host.");
 }
 
 /*
@@ -116,7 +118,7 @@ static int open_sock(const char *ip, int *serverfd, int *connfd)
  * Returns 0 if file name matches a file to not delete.
  * Otherwize returns != 0.
  */
-static int dont_delete_pls(const char *filename)
+static inline int dont_delete_pls(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
@@ -162,20 +164,28 @@ int main(int argc, char **argv)
 
 	while ((arg = argv[1]) != NULL) {
 		if (*arg != '-')
-			break;
+			die("Error caugh unknown flag: %s", arg);
+
 		for (;;) {
 			switch (*++arg) {
+			case 'B':
 			case 'b':
 				backup = 1;
 				continue;
+			case 'V':
 			case 'v':
 				verbose = 1;
 				continue;
+			case '-':
+				break;
 			case 0:
 			default:
 				break;
 			}
 			break;
+		}
+		if (!strcmp("-ip", arg)) {
+			IP = *++argv;
 		}
 		argv++;
 	}
@@ -188,7 +198,7 @@ int main(int argc, char **argv)
 	if (verbose)
 		v_log("Opening socket.");
 
-	open_sock("127.0.0.1", &serverfd, &connfd);
+	open_sock(IP, &serverfd, &connfd);
 
 	if (verbose)
 		v_log("Finished opening socket and connection established,"

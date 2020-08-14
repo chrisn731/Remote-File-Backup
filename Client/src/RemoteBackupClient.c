@@ -14,17 +14,17 @@
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
 
-#define RIP "192.168.1.35"
-
+static char *IP = "192.168.1.35";
 static int backup = 0;
 int verbose = 0;
 
 static void print_usage(void)
 {
 	printf("Error Incorrect Usage:\n"
-		"./RBClient [-v] [-b]\n"
-		"-v\tTurn on verbose\n"
-		"-b\tDo a backup\n");
+		"./RBClient [-v/V] [-b/B] [--ip {IP}]\n"
+		"-v/V\tTurn on verbose\n"
+		"-b/B\tDo a backup\n"
+		"--ip\tSet ip of remote host");
 }
 
 
@@ -42,7 +42,7 @@ static int open_sock(unsigned int port, const char *ip)
 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr = inet_addr(RIP);
+	serv_addr.sin_addr.s_addr = inet_addr(IP);
 
 	if (verbose)
 		v_log("Attempting to connect to server");
@@ -132,7 +132,6 @@ int main(int argc, char **argv)
 	int sockfd;
 
 	if (argc < 2) {
-		/* Usage will go here */
 		print_usage();
 		return 1;
 	}
@@ -149,15 +148,20 @@ int main(int argc, char **argv)
 				backup = 1;
 				continue;
 
+			case 'V':
 			case 'v':
 				verbose = 1;
 				continue;
-			case 0:
+			case '-':
 				break;
+			case 0:
 			default:
 				break;
 			}
 			break;
+		}
+		if (!strcmp("-ip", arg)) {
+			IP = *++argv;
 		}
 		argv++;
 	}
@@ -167,7 +171,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	sockfd = open_sock(PORT, RIP);
+	sockfd = open_sock(PORT, IP);
 
 	begin_backup(sockfd, ".");
 
