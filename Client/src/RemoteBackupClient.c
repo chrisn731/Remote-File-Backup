@@ -58,7 +58,7 @@ static int open_sock(unsigned int port, const char *ip)
  * Function to skip certain filenames while parsing directory.
  * Returns 0 if it is a file to skip, != 0 otherwise.
  */
-static int dont_skip(const char *filename)
+static inline int dont_skip(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
