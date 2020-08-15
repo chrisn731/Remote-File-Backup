@@ -30,7 +30,7 @@ static void print_usage(void)
 		"./RBServer [-v/V] [-b/B] [--ip {IP}]\n"
 		"-v/V\tTurn on verbose\n"
 		"-b/B\tDo a backup\n"
-		"--ip\tSet ip of host.");
+		"--ip\tSet ip of host.\n");
 }
 
 /*
