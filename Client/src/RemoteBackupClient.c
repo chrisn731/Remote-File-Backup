@@ -4,12 +4,6 @@
  * types of files through a socket.
  */
 
-
-/*
- * TODO:
- * FUTURE: Make server multi-thread capable
- */
-
 #include "../include/RemoteBackupClient.h"
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
@@ -50,6 +44,9 @@ static int open_sock(unsigned int port, const char *ip)
 	/* Keep trying to connect until connection is made */
 	while (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 		sleep(2);
+
+	if (verbose)
+		v_log("Connection established.");
 
 	return sock;
 }
@@ -100,6 +97,9 @@ static void backup_dir(int sockfd, const char *path)
 
 	if (chdir(path))
 		die("Error: Failed to change into directory: %s", path);
+
+	if (verbose)
+		v_log("Attempting to backup directory: %s", path);
 
 	while ((de = readdir(dr)) != NULL) {
 		if (dont_skip(de->d_name)) {
