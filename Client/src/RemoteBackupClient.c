@@ -35,7 +35,7 @@ static int open_sock(unsigned int port, const char *ip)
 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr = inet_addr(ip);
+	serv_addr.sin_addr.s_addr = inet_addr("192.168.1.30");
 
 	if (verbose)
 		v_log("Attempting to connect to server");
@@ -153,8 +153,10 @@ int main(int argc, char **argv)
 				verbose = 1;
 				continue;
 			case '-':
-				if (!strcmp("-ip", arg))
-					IP = *++argv;
+				if (!strcmp("-ip", arg)) {
+					IP = argv[2];
+					argv++;
+				}
 
 				break;
 			case 0:
