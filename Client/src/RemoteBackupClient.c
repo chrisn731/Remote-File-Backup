@@ -8,7 +8,6 @@
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
 
-static char *IP = "192.168.1.35";
 static int backup = 0;
 int verbose = 0;
 
@@ -36,7 +35,7 @@ static int open_sock(unsigned int port, const char *ip)
 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr = inet_addr(IP);
+	serv_addr.sin_addr.s_addr = inet_addr(ip);
 
 	if (verbose)
 		v_log("Attempting to connect to server");
@@ -130,6 +129,7 @@ int main(int argc, char **argv)
 {
 	char *arg;
 	int sockfd;
+	char *IP = NULL;
 
 	if (argc < 2) {
 		print_usage();
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 		argv++;
 	}
 
-	if (!backup) {
+	if (!backup || !IP) {
 		print_usage();
 		return 1;
 	}

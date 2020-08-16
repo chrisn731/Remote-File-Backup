@@ -20,7 +20,6 @@
 /* Used to make sure we dont delete the process during directory cleaning. */
 #define PROG_NAME "RBServer"
 
-static char *IP = "127.0.0.1";
 static int backup = 0;
 int verbose = 0;
 
@@ -84,7 +83,7 @@ static int begin_backup(int connfd)
 	return 0;
 }
 
-static int open_sock(const char *ip, int *serverfd, int *connfd)
+static int open_sock(int *serverfd, int *connfd)
 {
 	int addrlen;
 	struct sockaddr_in servaddr, cli;
@@ -177,8 +176,6 @@ int main(int argc, char **argv)
 				verbose = 1;
 				continue;
 			case '-':
-				if (!strcmp("-ip", arg))
-					IP = *++argv;
 				break;
 			case 0:
 			default:
@@ -197,7 +194,7 @@ int main(int argc, char **argv)
 	if (verbose)
 		v_log("Opening socket.");
 
-	open_sock(IP, &serverfd, &connfd);
+	open_sock(&serverfd, &connfd);
 
 	if (verbose)
 		v_log("Finished opening socket and connection established,"
