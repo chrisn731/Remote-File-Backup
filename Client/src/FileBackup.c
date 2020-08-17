@@ -1,4 +1,5 @@
 #include "../include/FileBackup.h"
+#include "../include/ProgressBar.h"
 
 enum operation {
 	S_ACTN = 0,
@@ -92,6 +93,42 @@ void send_filecontent(int sockfd, const char *filename)
 
 		/* Send the data */
 		send_data(sockfd, data, read, S_FCONT);
+
+	} while (read == STD_BUFF_SZ);
+
+	fclose(fp);
+}
+
+/*
+ * Open a file and send its contents to the server.
+ * While sending the file, show the user and nice progress bar.
+ */
+void send_filecontent_verbosely(int sockfd, const char *filename,
+				struct stat *st)
+{
+	FILE *fp;
+	char data[STD_BUFF_SZ];
+	int32_t conv;
+	int read;
+	long totalread, runningread = 0;
+
+	if (!(fp = fopen(filename, "r")))
+		die("Error reading from: %s", filename);
+
+	totalread = st->st_mode;
+
+	do {
+		zerobuf(data, STD_BUFF_SZ);
+		read = fread(data, 1, STD_BUFF_SZ, fp);
+
+		/* Send how much data is to be read */
+		runningread += read;
+		conv = htonl(read);
+		send_data(sockfd, &conv, sizeof(conv), S_FCONT);
+
+		/* Send the data */
+		send_data(sockfd, data, read, S_FCONT);
+		verbose_progressbar(runningread, totalread);
 
 	} while (read == STD_BUFF_SZ);
 

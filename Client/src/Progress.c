@@ -56,7 +56,7 @@ unsigned int num_of_files(const char *path)
 	return total;
 }
 
-int progress_bar(long done, long total)
+int verbose_progressbar(long done, long total)
 {
 	int barlen = 20;
 	int hashes = barlen * ((float) done / total);
@@ -72,6 +72,7 @@ int progress_bar(long done, long total)
 		}
 	}
 	fputc(']', stdout);
+	printf(" %d%%", percent_done);
 	fputc('\r', stdout);
 	fflush(stdout);
 
