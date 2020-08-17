@@ -7,8 +7,10 @@
 #include "../include/RemoteBackupClient.h"
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
+#include "../include/ProgressBar.h"
 
-static int backup = 0;
+static unsigned int totalfilecount = 0;
+static unsigned int totalfilesbacked = 0;
 int verbose = 0;
 
 static void print_usage(void)
@@ -69,13 +71,15 @@ static void backup_file(const char *filename, const int sockfd)
 	if (verbose)
 		v_log("Attempting to backup %s", filename);
 
-
 	stat(filename, &filedata);
 
 	send_action(sockfd, 'F');
 	send_filename(sockfd, filename);
 	send_filemode(sockfd, &filedata);
 	send_filecontent(sockfd, filename);
+
+	if (!verbose)
+		non_verbose_progressbar(++totalfilesbacked, ++totalfilecount);
 }
 
 /*
@@ -113,6 +117,7 @@ static void backup_dir(int sockfd, const char *path)
 			}
 		}
 	}
+	closedir(dr);
 }
 
 /* Kick off function for backing up a given directory */
@@ -127,9 +132,8 @@ static void begin_backup(int sockfd, const char *path)
 
 int main(int argc, char **argv)
 {
-	char *arg;
-	int sockfd;
-	char *IP = NULL;
+	char *arg, *IP = NULL;
+	int sockfd, backup;
 
 	if (argc < 2) {
 		print_usage();
@@ -174,11 +178,11 @@ int main(int argc, char **argv)
 	}
 
 	sockfd = open_sock(PORT, IP);
+	totalfilecount = num_of_files(".");
 
 	begin_backup(sockfd, ".");
 
 	printf("Backup complete.\n");
 	close(sockfd);
 	return 0;
-
 }
