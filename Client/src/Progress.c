@@ -60,6 +60,7 @@ int progress_bar(long done, long total)
 {
 	int barlen = 20;
 	int hashes = barlen * ((float) done / total);
+	int percent_done = 100 * ((float) done / total);
 
 	fputs(" [", stdout);
 	while (barlen-- > 0) {
@@ -72,6 +73,7 @@ int progress_bar(long done, long total)
 	}
 	fputc(']', stdout);
 	fputc('\r', stdout);
+	fflush(stdout);
 
 	return 0;
 }
