@@ -68,20 +68,16 @@ static void backup_file(const char *filename, const int sockfd)
 {
 	struct stat filedata;
 
-	if (verbose)
-		v_log("Attempting to backup %s ", filename);
-
 	stat(filename, &filedata);
 
 	send_action(sockfd, 'F');
 	send_filename(sockfd, filename);
 	send_filemode(sockfd, &filedata);
-
 	if (verbose) {
 		send_filecontent_verbosely(sockfd, filename, &filedata);;
 	} else {
 		send_filecontent(sockfd, filename);
-		non_verbose_progressbar(++totalfilesbacked, ++totalfilecount);
+		non_verbose_progressbar(++totalfilesbacked, totalfilecount);
 	}
 }
 
@@ -182,6 +178,8 @@ int main(int argc, char **argv)
 
 	sockfd = open_sock(PORT, IP);
 	totalfilecount = num_of_files(".");
+
+	printf("Beginning Backup...\n");
 
 	begin_backup(sockfd, ".");
 

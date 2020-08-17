@@ -24,5 +24,5 @@ clean:
 	rm $(OBJ)/*.o
 
 
-quick: src/FileBackup.c src/RemoteBackupClient.c ../Shared/Helper.c
+quick: src/FileBackup.c src/RemoteBackupClient.c src/Progress.c ../Shared/Helper.c
 	$(CC) $(CFLAGS) $^ -o $(EXE)

@@ -19,7 +19,7 @@ int non_verbose_progressbar(int files_backed, int total_files)
 	unsigned int hashes = barlen * ((float) files_backed/total_files);
 
 	putchar('[');
-	while (barlen-- > 0) {
+	while (barlen-- != 0) {
 		if (hashes-- != 0)
 			putchar('#');
 		else
@@ -27,8 +27,13 @@ int non_verbose_progressbar(int files_backed, int total_files)
 	}
 	putchar(']');
 	printf(" (%d/%d)", files_backed, total_files);
-	putchar('\r');
-	fflush(stdout);
+
+	if (files_backed == total_files) {
+		printf("\n");
+	} else {
+		putchar('\r');
+		fflush(stdout);
+	}
 
 	return 0;
 }
@@ -56,22 +61,22 @@ unsigned int num_of_files(const char *path)
 	return total;
 }
 
-int verbose_progressbar(long done, long total)
+int verbose_progressbar(const char *fname, long done, long total)
 {
-	int barlen = 20;
+	int barlen = BAR_LENGTH;
 	int hashes = barlen * ((float) done / total);
 	int percent_done = 100 * ((float) done / total);
 
+	printf("Backing up %s\t", fname);
+
 	fputs(" [", stdout);
-	while (barlen-- > 0) {
-		if (hashes > 0) {
-			fputc('#', stdout);
-			hashes--;
-		} else {
+	while (barlen-- != 0) {
+		if (hashes-- != 0)
+			putchar('#');
+		else
 			fputc('-', stdout);
-		}
 	}
-	fputc(']', stdout);
+	putchar(']');
 	printf(" %d%%", percent_done);
 	fputc('\r', stdout);
 	fflush(stdout);

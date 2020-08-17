@@ -115,22 +115,23 @@ void send_filecontent_verbosely(int sockfd, const char *filename,
 	if (!(fp = fopen(filename, "r")))
 		die("Error reading from: %s", filename);
 
-	totalread = st->st_mode;
+	totalread = st->st_size;
 
 	do {
 		zerobuf(data, STD_BUFF_SZ);
 		read = fread(data, 1, STD_BUFF_SZ, fp);
+		runningread += read;
 
 		/* Send how much data is to be read */
-		runningread += read;
 		conv = htonl(read);
 		send_data(sockfd, &conv, sizeof(conv), S_FCONT);
 
 		/* Send the data */
 		send_data(sockfd, data, read, S_FCONT);
-		verbose_progressbar(runningread, totalread);
+		verbose_progressbar(filename, runningread, totalread);
 
 	} while (read == STD_BUFF_SZ);
+	putchar('\n');
 
 	fclose(fp);
 }
