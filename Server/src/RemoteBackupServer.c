@@ -1,7 +1,7 @@
 /*
  * Server side of the remote backup.
  * Point of this program is to:
- * 1. Clean out the backup directory.
+ * 1. Clean out the directory it is in.
  * 2. Open socket and connect to the remote backup client.
  * 3. Once connection is established, start receiving files
  *    from client and create files / dirs.
@@ -15,12 +15,12 @@
 #include <dirent.h>
 #include "../include/CleanDirs.h"
 #include "../include/FileReciever.h"
-#include "../../Shared/Helper.h"
+#include "../include/Helper.h"
+#include "../include/Progress.h"
 
 /* Used to make sure we dont delete the process during directory cleaning. */
 #define PROG_NAME "RBServer"
 
-static int backup = 0;
 int verbose = 0;
 
 static void print_usage(void)
@@ -44,7 +44,7 @@ static int begin_backup(int connfd)
 
 	char buffer[STD_BUFF_SZ];
 	char state;
-	unsigned int totalfiles;
+	int totalfiles, filesbacked;
 	struct stat st;
 
 	recieve_numoffiles(connfd, &totalfiles);
@@ -54,30 +54,34 @@ static int begin_backup(int connfd)
 		switch (state) {
 		case 'D':
 			recieve_filename(connfd, buffer);
-			v_log("Recieved dir: %s", buffer);
+			if (verbose)
+				v_log("Recieved dir: %s", buffer);
 			mkdir(buffer, 0755);
 			chdir(buffer);
-			/* Do some shit for dir making */
 			continue;
 
 		case 'F':
-			/* Do some shit for file making */
 			recieve_filename(connfd, buffer);
-			v_log("Recieved file: %s", buffer);
+			if (verbose)
+				verbose_progressbar(buffer, ++filesbacked, totalfiles);
 			recieve_filemode(connfd, &st);
 			recieve_filecontent(connfd, buffer, &st);
+			if (verbose)
+				printf(" Done.\n");
+			else
+				non_verbose_progressbar(++filesbacked, totalfiles);
 			continue;
 
-		case 'R':
+		case 'R': /* Return up the directory */
 			chdir("..");
 			continue;
 
-		case 'E':
+		case 'E': /* E for End of Stream */
 			v_log("End of stream action recieved. Closing up...");
 			break;
 		case 0:
-		default:
-			break;
+		default: /* 0 and default are the error case. */
+			return 1;
 		}
 		break;
 	}
@@ -154,7 +158,7 @@ static int purge_dir(void)
 
 int main(int argc, char **argv)
 {
-	int serverfd, connfd;
+	int serverfd, connfd, backup;
 	char *arg;
 
 	if (argc < 2) {
@@ -208,7 +212,11 @@ int main(int argc, char **argv)
 
 	/* At this point we have a clean directory ready for files */
 
-	begin_backup(connfd);
+	if (begin_backup(connfd)) {
+		close(connfd);
+		close(serverfd);
+		die("Fatal Error: Recieved bad action from client. Closing.");
+	}
 
 	if (verbose)
 		v_log("Finished backup. Cleaning up...");

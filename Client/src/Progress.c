@@ -3,7 +3,6 @@
 #include "../../Shared/Helper.h"
 #include "../include/ProgressBar.h"
 
-
 #define BAR_LENGTH 30
 
 static inline int file_to_count(const char *filename)

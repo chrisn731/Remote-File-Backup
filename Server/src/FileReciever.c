@@ -91,7 +91,7 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 	chmod(filename, st->st_mode);
 }
 
-void recieve_numoffiles(int sockfd, unsigned int *total)
+void recieve_numoffiles(int sockfd, int *total)
 {
 	int32_t conv;
 

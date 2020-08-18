@@ -1,22 +1,13 @@
 CC 	= gcc
 CFLAGS 	= -Wall -Werror
+CHELPR 	= ../Shared/Helper.c
 
-server: RemoteBackupServer.o CleanDirs.o FileReciever.o
-	gcc RemoteBackupServer.o CleanDirs.o FileReciever.o -o RemoteBackupServer
-
-RemoteBackupServer.o: RemoteBackupServer.c
-	$(CC) $(CFLAGS) RemoteBackupServer.c
-
-CleanDirs.o: CleanDirs.c
-	$(CC) $(CFLAGS) CleanDirs.c
-
-FileReciever.o: FileReciever.c
-	$(CC) $(CFLAGS) FileReciever.c
+all: quick
 
 clean:
 	rm *.o
 
-quick: src/CleanDirs.c src/FileReciever.c src/RemoteBackupServer.c ../Shared/Helper.c
+quick: src/CleanDirs.c src/FileReciever.c src/RemoteBackupServer.c src/Progress.c $(CHELPR)
 	$(CC) $(CFLAGS) $^ -o RBServer
 
-.PHONY: all server
+.PHONY: all server quick clean
