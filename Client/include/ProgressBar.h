@@ -1,6 +1,7 @@
 #ifndef PROGBAR_H_G
 #define PROGBAR_H_G
 
+#include "Helper.h"
 
 extern unsigned int num_of_files(const char *path);
 extern int verbose_progressbar(const char *filename, long done, long total);

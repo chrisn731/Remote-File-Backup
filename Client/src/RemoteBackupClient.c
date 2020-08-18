@@ -4,15 +4,15 @@
  * types of files through a socket.
  */
 
-#include "../include/Helper.h"
-#include "../include/FileBackup.h"
-#include "../include/ProgressBar.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <sys/stat.h>
+#include "../include/Helper.h"
+#include "../include/FileBackup.h"
+#include "../include/ProgressBar.h"
 
 static unsigned int totalfilecount = 0;
 static unsigned int totalfilesbacked = 0;

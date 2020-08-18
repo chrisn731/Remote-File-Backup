@@ -1,7 +1,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "../include/Progress.h"
-#include "../include/Helper.h"
 
 #define BAR_LENGTH 30
 
