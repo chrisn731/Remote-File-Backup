@@ -4,7 +4,6 @@
  * types of files through a socket.
  */
 
-#include "../include/RemoteBackupClient.h"
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
 #include "../include/ProgressBar.h"
@@ -44,7 +43,7 @@ static int open_sock(unsigned int port, const char *ip)
 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr = inet_addr("192.168.1.30");
+	serv_addr.sin_addr.s_addr = inet_addr(ip);
 
 	if (verbose)
 		v_log("Attempting to connect to server");

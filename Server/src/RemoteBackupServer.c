@@ -28,8 +28,7 @@ static void print_usage(void)
 	printf("Error Incorrect Usage:\n"
 		"./RBServer [-v/V] [-b/B] [--ip {IP}]\n"
 		"-v/V\tTurn on verbose\n"
-		"-b/B\tDo a backup\n"
-		"--ip\tSet ip of host.\n");
+		"-b/B\tDo a backup\n");
 }
 
 /*
