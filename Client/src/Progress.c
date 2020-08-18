@@ -19,8 +19,8 @@ static inline int file_to_count(const char *filename)
  */
 int non_verbose_progressbar(int files_backed, int total_files)
 {
-	unsigned int barlen = BAR_LENGTH;
-	unsigned int hashes;
+	int barlen = BAR_LENGTH;
+	int hashes;
 
 	if (files_backed <= 0)
 		hashes = 0;
