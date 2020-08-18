@@ -42,8 +42,7 @@ int verbose_progressbar(const char *filename, int files_backed, int total_files)
 	if (files_backed <= 0)
 		return 1;
 
-	fputs(" (", stdout);
-	printf("%d/%d)", files_backed, total_files);
+	printf(" (%d/%d)", files_backed, total_files);
 	printf("Recieving file: %s...", filename);
 	fflush(stdout);
 
