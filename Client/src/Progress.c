@@ -1,5 +1,4 @@
 #include <dirent.h>
-#include <stdio.h>
 #include <sys/stat.h>
 #include "../../Shared/Helper.h"
 #include "../include/ProgressBar.h"
@@ -40,7 +39,7 @@ int non_verbose_progressbar(int files_backed, int total_files)
 	printf(" (%d/%d)", files_backed, total_files);
 
 	if (files_backed == total_files) {
-		printf("\n");
+		putchar('\n');
 	} else {
 		putchar('\r');
 		fflush(stdout);
