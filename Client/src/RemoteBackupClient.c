@@ -21,11 +21,11 @@ int verbose = 0;
 static void print_usage(const char *user_err)
 {
 	printf("%s\n", user_err);
-	printf("Usage:\n"
-		"./RBClient [-v/V] [-b/B] [--ip {IP}]\n"
-		"-v/V\tTurn on verbose\n"
-		"-b/B\tDo a backup\n"
-		"--ip\tSet ip of remote host\n");
+	printf("Usage: ./RBClient [FLAGS...]\n\n"
+		" Flags:\n"
+		"  -v, -V\tBe Verbose.\n"
+		"  -b, -B\tDo a backup.\n"
+		"  --ip\t\tSet ip of remote host.\n\n");
 }
 
 
@@ -179,7 +179,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!backup) {
-		print_usage("Error: Backup flag not set");
+		print_usage("Error: Backup flag not set. Nothing to do.");
 		return 1;
 	}
 

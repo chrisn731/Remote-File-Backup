@@ -23,12 +23,14 @@
 
 int verbose = 0;
 
-static void print_usage(void)
+static void print_usage(const char *user_err, ...)
 {
+	printf("%s\n", user_err);
 	printf("Error Incorrect Usage:\n"
-		"./RBServer [-v/V] [-b/B] [--ip {IP}]\n"
-		"-v/V\tTurn on verbose\n"
-		"-b/B\tDo a backup\n");
+		"Usage: ./RBServer [FLAGS...]\n\n"
+		" Flags:\n"
+		"  -v, -V\tBe Verbose.\n"
+		"  -b, -B\tDo a backup\n\n");
 }
 
 /*
@@ -162,13 +164,15 @@ int main(int argc, char **argv)
 	char *arg;
 
 	if (argc < 2) {
-		print_usage();
+		print_usage("Error: too few arguments.");;
 		return 1;
 	}
 
 	while ((arg = argv[1]) != NULL) {
-		if (*arg != '-')
-			die("Error caugh unknown flag: %s", arg);
+		if (*arg != '-') {
+			print_usage("Error caught unknown flag: %s", arg);
+			return 1;
+		}
 
 		for (;;) {
 			switch (*++arg) {
@@ -192,7 +196,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!backup) {
-		print_usage();
+		print_usage("Backup flag not set. Nothing to do.");
 		return 1;
 	}
 

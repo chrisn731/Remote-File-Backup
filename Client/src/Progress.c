@@ -110,7 +110,7 @@ int verbose_progressbar(const char *fname, long done, long total)
 	}
 	putchar(']');
 	printf(" %d%%", percent_done);
-	fputc('\r', stdout);
+	putchar('\r');
 	fflush(stdout);
 
 	return 0;
