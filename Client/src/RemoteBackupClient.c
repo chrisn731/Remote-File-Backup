@@ -8,6 +8,7 @@
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
 #include "../include/ProgressBar.h"
+#include <errno.h>
 
 static unsigned int totalfilecount = 0;
 static unsigned int totalfilesbacked = 0;
@@ -116,7 +117,6 @@ static void backup_dir(int sockfd, const char *path)
 			}
 		}
 	}
-	closedir(dr);
 }
 
 /* Kick off function for backing up a given directory */

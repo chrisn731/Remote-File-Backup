@@ -5,7 +5,7 @@
 #include "../include/ProgressBar.h"
 
 
-#define BAR_LENGTH 20
+#define BAR_LENGTH 30
 
 static inline int file_to_count(const char *filename)
 {
@@ -16,14 +16,22 @@ static inline int file_to_count(const char *filename)
 int non_verbose_progressbar(int files_backed, int total_files)
 {
 	unsigned int barlen = BAR_LENGTH;
-	unsigned int hashes = barlen * ((float) files_backed/total_files);
+	unsigned int hashes;
 
-	putchar('[');
+	if (files_backed <= 0)
+		hashes = 0;
+	else
+		hashes = barlen * ((float) files_backed / total_files);
+
+
+	fputs(" [", stdout);
 	while (barlen-- != 0) {
-		if (hashes-- != 0)
+		if (hashes > 0) {
 			putchar('#');
-		else
+			hashes--;
+		} else {
 			putchar('-');
+		}
 	}
 	putchar(']');
 	printf(" (%d/%d)", files_backed, total_files);
@@ -51,10 +59,12 @@ unsigned int num_of_files(const char *path)
 
 	while ((entry = readdir(dr)) != NULL) {
 		if (file_to_count(entry->d_name)) {
-			if (entry->d_type == DT_DIR)
+			if (entry->d_type == DT_DIR) {
 				total += num_of_files(entry->d_name);
-			else
+				chdir("..");
+			} else {
 				total++;
+			}
 		}
 	}
 	closedir(dr);
@@ -63,18 +73,32 @@ unsigned int num_of_files(const char *path)
 
 int verbose_progressbar(const char *fname, long done, long total)
 {
-	int barlen = BAR_LENGTH;
-	int hashes = barlen * ((float) done / total);
-	int percent_done = 100 * ((float) done / total);
+	int barlen, hashes, percent_done;
 
-	printf("Backing up %s\t", fname);
+	barlen = BAR_LENGTH;
+	if (done < 1) {
+		/* This case will only be triggered for empty files */
+		if (done == total) {
+			hashes = barlen;
+			percent_done = 100;
+		} else {
+			hashes = 0;
+			percent_done = 0;
+		}
+	} else {
+		hashes = barlen * ((float) done / total);
+		percent_done = 100 * ((float) done / total);
+	}
 
+	printf(" Backing up %-130s\t", fname);
 	fputs(" [", stdout);
-	while (barlen-- != 0) {
-		if (hashes-- != 0)
+	while (barlen-- > 0) {
+		if (hashes > 0) {
 			putchar('#');
-		else
-			fputc('-', stdout);
+			hashes--;
+		} else {
+			putchar('-');
+		}
 	}
 	putchar(']');
 	printf(" %d%%", percent_done);
