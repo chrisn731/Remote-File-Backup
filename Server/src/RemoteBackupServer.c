@@ -44,8 +44,10 @@ static int begin_backup(int connfd)
 
 	char buffer[STD_BUFF_SZ];
 	char state;
+	unsigned int totalfiles;
 	struct stat st;
 
+	recieve_numoffiles(connfd, &totalfiles);
 	for (;;) {
 		recieve_action(connfd, &state);
 

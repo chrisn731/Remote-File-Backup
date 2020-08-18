@@ -5,6 +5,7 @@ enum operation {
 	R_FNAME,
 	R_FMODE,
 	R_FCONT,
+	R_COUNT,
 };
 
 static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
@@ -31,6 +32,8 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 				die("Error recieving filemode");
 			case R_FCONT:
 				die("Error reading filecontent");
+			case R_COUNT:
+				die("Error recieving file count");
 			default:
 				die("Unknown error while reading data");
 			}
@@ -86,4 +89,12 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 
 	fclose(fp);
 	chmod(filename, st->st_mode);
+}
+
+void recieve_numoffiles(int sockfd, unsigned int *total)
+{
+	int32_t conv;
+
+	read_data(sockfd, &conv, sizeof(int32_t), R_COUNT);
+	*total = ntohl(conv);
 }

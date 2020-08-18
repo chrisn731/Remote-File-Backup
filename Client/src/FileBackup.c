@@ -7,6 +7,7 @@ enum operation {
 	S_FMODE,
 	S_MESSG,
 	S_FCONT,
+	S_COUNT,
 };
 
 /* Send data through socket. */
@@ -32,6 +33,8 @@ static void send_data(int sockfd, void *data, size_t amt, enum operation op)
 				die("Error while sending message");
 			case S_FCONT:
 				die("Error while sending file content");
+			case S_COUNT:
+				die("Error while sending file count");
 			default:
 				die("Fatal unknown error");;
 			}
@@ -70,6 +73,14 @@ void send_filemode(int sockfd, struct stat *st)
 void send_message(int sockfd, const char *msg, size_t msgsize)
 {
 	send_data(sockfd, (void *) msg, msgsize, S_MESSG);
+}
+
+void send_filecount(int sockfd, unsigned int total)
+{
+	int32_t conv;
+
+	conv = htonl(total);
+	send_data(sockfd, &conv, sizeof(int32_t), S_COUNT);
 }
 
 /* Open a file and send the contents of it to server */

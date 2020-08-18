@@ -5,7 +5,7 @@
 #define _XOPEN_SOURCE 500
 
 #include <ftw.h>
-#include "../../Shared/Helper.h"
+#include "Helper.h"
 
 extern int verbose;
 

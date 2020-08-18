@@ -4,7 +4,7 @@
  * types of files through a socket.
  */
 
-#include "../../Shared/Helper.h"
+#include "../include/Helper.h"
 #include "../include/FileBackup.h"
 #include "../include/ProgressBar.h"
 #include <sys/socket.h>
@@ -129,6 +129,7 @@ static void backup_dir(int sockfd, const char *path)
 static void begin_backup(int sockfd, const char *path)
 {
 	/* Begin backup with the directory that the program is in */
+	send_filecount(sockfd, totalfilecount);
 	backup_dir(sockfd, ".");
 
 	/* Send 'E'nd to the server to tell it to stop. */
