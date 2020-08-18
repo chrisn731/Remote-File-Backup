@@ -8,15 +8,21 @@
 #include "../../Shared/Helper.h"
 #include "../include/FileBackup.h"
 #include "../include/ProgressBar.h"
-#include <errno.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/stat.h>
 
 static unsigned int totalfilecount = 0;
 static unsigned int totalfilesbacked = 0;
 int verbose = 0;
 
-static void print_usage(void)
+static void print_usage(const char *user_err)
 {
-	printf("Error Incorrect Usage:\n"
+	printf("%s\n", user_err);
+	printf("Usage:\n"
 		"./RBClient [-v/V] [-b/B] [--ip {IP}]\n"
 		"-v/V\tTurn on verbose\n"
 		"-b/B\tDo a backup\n"
@@ -117,6 +123,7 @@ static void backup_dir(int sockfd, const char *path)
 			}
 		}
 	}
+	closedir(dr);
 }
 
 /* Kick off function for backing up a given directory */
@@ -135,7 +142,7 @@ int main(int argc, char **argv)
 	int sockfd, backup;
 
 	if (argc < 2) {
-		print_usage();
+		print_usage("Error: Too few arguemnts");
 		return 1;
 	}
 
@@ -171,8 +178,13 @@ int main(int argc, char **argv)
 		argv++;
 	}
 
-	if (!backup || !IP) {
-		print_usage();
+	if (!backup) {
+		print_usage("Error: Backup flag not set");
+		return 1;
+	}
+
+	if (!IP) {
+		print_usage("Error: Remote host IP not set.");
 		return 1;
 	}
 
