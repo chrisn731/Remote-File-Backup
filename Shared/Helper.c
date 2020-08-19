@@ -29,11 +29,11 @@ int strcmp(const char *p1, const char *p2)
 	return c2 - c1;
 }
 
-/* Zero out buffer (buf) of a given size (bufsize) */
-void zerobuf(char *buf, size_t bufsize)
+/* Zero out buffer of a given size */
+void zerobuf(char *buffer, size_t bufsize)
 {
 	while (bufsize-- > 0)
-		*buf++ = '\0';
+		*buffer++ = 0;
 }
 
 /* Verbose Logging. */
