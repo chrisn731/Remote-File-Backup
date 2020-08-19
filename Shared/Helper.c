@@ -20,10 +20,8 @@ int strcmp(const char *p1, const char *p2)
 	do {
 		c1 = *p1++;
 		c2 = *p2++;
-
 		if (c1 == '\0')
 			return c2 - c1;
-
 	} while (c1 == c2);
 
 	return c2 - c1;
