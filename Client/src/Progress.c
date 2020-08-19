@@ -1,5 +1,3 @@
-#include <dirent.h>
-#include <sys/stat.h>
 #include "../include/ProgressBar.h"
 
 #define BAR_LENGTH 30

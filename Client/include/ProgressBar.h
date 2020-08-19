@@ -1,6 +1,8 @@
 #ifndef PROGBAR_H_G
 #define PROGBAR_H_G
 
+#include <dirent.h>
+#include <sys/stat.h>
 #include "Helper.h"
 
 extern unsigned int num_of_files(const char *path);

@@ -1,5 +1,4 @@
 #include "../include/FileBackup.h"
-#include "../include/ProgressBar.h"
 
 enum operation {
 	S_ACTN = 0,
