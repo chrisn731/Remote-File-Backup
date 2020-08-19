@@ -3,7 +3,6 @@
  * One benefit of this over scp is that it will recursively send all
  * types of files through a socket.
  */
-
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <dirent.h>
@@ -79,12 +78,10 @@ static void backup_file(const char *filename, const int sockfd)
 	send_action(sockfd, 'F');
 	send_filename(sockfd, filename);
 	send_filemode(sockfd, &filedata);
-	if (verbose) {
-		send_filecontent_verbosely(sockfd, filename, &filedata);;
-	} else {
-		send_filecontent(sockfd, filename);
-		non_verbose_progressbar(++totalfilesbacked, totalfilecount);
-	}
+	if (verbose)
+		send_filecontent_verbosely(sockfd, filename, &filedata);
+	else
+		send_filecontent(sockfd, filename, ++totalfilesbacked, totalfilecount);
 }
 
 /*
@@ -102,7 +99,6 @@ static void backup_dir(int sockfd, const char *path)
 
 	if (!(dr = opendir(path)))
 		die("Could not open directory: %s", path);
-
 	if (chdir(path))
 		die("Error: Failed to change into directory: %s", path);
 
@@ -157,7 +153,6 @@ int main(int argc, char **argv)
 				/* backup shit */
 				backup = 1;
 				continue;
-
 			case 'V':
 			case 'v':
 				verbose = 1;
@@ -167,7 +162,6 @@ int main(int argc, char **argv)
 					IP = argv[2];
 					argv++;
 				}
-
 				break;
 			case 0:
 			default:
@@ -177,25 +171,21 @@ int main(int argc, char **argv)
 		}
 		argv++;
 	}
-
 	if (!backup) {
 		print_usage("Error: Backup flag not set. Nothing to do.");
 		return 1;
 	}
-
 	if (!IP) {
 		print_usage("Error: Remote host IP not set.");
 		return 1;
 	}
-
 	sockfd = open_sock(PORT, IP);
 	totalfilecount = num_of_files(".");
 
 	printf("Beginning Backup...\n");
-
 	begin_backup(sockfd, ".");
-
 	printf("Backup complete.\n");
+
 	close(sockfd);
 	return 0;
 }

@@ -15,7 +15,7 @@ static void send_data(int sockfd, void *data, size_t amt, enum operation op)
 	int rc;
 	char *byte = data;
 
-	if (!amt)
+	if (amt == 0)
 		return;
 
 	do {
@@ -83,7 +83,8 @@ void send_filecount(int sockfd, unsigned int total)
 }
 
 /* Open a file and send the contents of it to server */
-void send_filecontent(int sockfd, const char *filename)
+void send_filecontent(int sockfd, const char *filename,
+			int num_files_backed, int total_files)
 {
 	FILE *fp;
 	char data[STD_BUFF_SZ];
@@ -95,16 +96,17 @@ void send_filecontent(int sockfd, const char *filename)
 
 	do {
 		zerobuf(data, STD_BUFF_SZ);
-		read = fread(data, 1, STD_BUFF_SZ, fp);
 
+		read = fread(data, 1, STD_BUFF_SZ, fp);
 		/* Send how much data is to be read */
 		conv = htonl(read);
 		send_data(sockfd, &conv, sizeof(conv), S_FCONT);
 
 		/* Send the data */
 		send_data(sockfd, data, read, S_FCONT);
-
 	} while (read == STD_BUFF_SZ);
+	/* Update the progress bar for total files backed */
+	non_verbose_progressbar(num_files_backed, total_files);
 
 	fclose(fp);
 }
@@ -126,20 +128,19 @@ void send_filecontent_verbosely(int sockfd, const char *filename,
 		die("Error reading from: %s", filename);
 
 	totalread = st->st_size;
-
 	do {
 		zerobuf(data, STD_BUFF_SZ);
+
 		read = fread(data, 1, STD_BUFF_SZ, fp);
 		runningread += read;
-
 		/* Send how much data is to be read */
 		conv = htonl(read);
 		send_data(sockfd, &conv, sizeof(conv), S_FCONT);
 
 		/* Send the data */
 		send_data(sockfd, data, read, S_FCONT);
+		/* Update progress bar after every write */
 		verbose_progressbar(filename, runningread, totalread);
-
 	} while (read == STD_BUFF_SZ);
 	putchar('\n');
 

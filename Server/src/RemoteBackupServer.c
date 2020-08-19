@@ -152,7 +152,6 @@ static int purge_dir(void)
 			}
 		}
 	}
-
 	closedir(dr);
 	return 0;
 }

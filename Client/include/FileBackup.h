@@ -11,7 +11,7 @@
 extern int verbose;
 
 extern void send_action(int sockfd, char ft);
-extern void send_filecontent(int sockfd, const char *filename);
+extern void send_filecontent(int sockfd, const char *filename, int, int);
 extern void send_filecontent_verbosely(int sockfd, const char *fname, struct stat *);
 extern void send_filecount(int sockfd, unsigned int total);
 extern void send_filemode(int sockfd, struct stat *st);
