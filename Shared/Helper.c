@@ -15,16 +15,17 @@ void die(const char *err, ...)
 
 int strcmp(const char *p1, const char *p2)
 {
-	char c1, c2;
+	unsigned char c1, c2;
 
-	do {
+	while (1) {
 		c1 = *p1++;
 		c2 = *p2++;
-		if (c1 == '\0')
-			return c2 - c1;
-	} while (c1 == c2);
-
-	return c2 - c1;
+		if (c1 != c2)
+			return c1 < c2 ? -1 : 1;
+		if (!c1)
+			break;
+	}
+	return 0;
 }
 
 /* Zero out buffer of a given size */
