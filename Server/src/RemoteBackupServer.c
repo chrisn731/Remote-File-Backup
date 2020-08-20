@@ -50,7 +50,7 @@ static int begin_backup(int connfd)
 	struct stat st;
 
 	recieve_numoffiles(connfd, &totalfiles);
-	for (;;) {
+	while (1) {
 		recieve_action(connfd, &state);
 
 		switch (state) {
@@ -96,7 +96,6 @@ static int open_sock(int *serverfd, int *connfd)
 	struct sockaddr_in servaddr, cli;
 
 	*serverfd = socket(AF_INET, SOCK_STREAM, 0);
-
 	if (!*serverfd)
 		die("Socket creation failed.");
 
@@ -112,7 +111,6 @@ static int open_sock(int *serverfd, int *connfd)
 
 	addrlen = sizeof(cli);
 	*connfd = accept(*serverfd, (struct sockaddr *) &cli, (socklen_t *) &addrlen);
-
 	if (*connfd < 0)
 		die("Accept error");
 
@@ -140,7 +138,7 @@ static int purge_dir(void)
 		die("Could not open current directory.");
 
 	if (verbose)
-		v_log("Purging Directory");
+		v_log("Cleaning Directory");
 
 	while ((de = readdir(dr)) != NULL) {
 		if (dont_delete_pls(de->d_name)) {
@@ -153,6 +151,9 @@ static int purge_dir(void)
 		}
 	}
 	closedir(dr);
+	if (verbose)
+		v_log("Finished Cleaning. Starting backup");
+
 	return 0;
 }
 
@@ -206,29 +207,20 @@ int main(int argc, char **argv)
 
 	if (verbose)
 		v_log("Finished opening socket and connection established,"
-			"preparing directory...");
+			" preparing directory...");
 
 	purge_dir();
 
-	if (verbose)
-		v_log("Finished Cleaning. Starting backup");
-
 	/* At this point we have a clean directory ready for files */
-
 	if (begin_backup(connfd)) {
 		close(connfd);
 		close(serverfd);
 		die("Fatal Error: Recieved bad action from client. Closing.");
 	}
 
-	if (verbose)
-		v_log("Finished backup. Cleaning up...");
+	v_log("Backup Complete.");
 
 	close(connfd);
 	close(serverfd);
-
-	if (verbose)
-		v_log("Done.");
-
 	return 0;
 }
