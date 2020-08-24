@@ -1,5 +1,13 @@
 #include "../include/FileReciever.h"
 
+#define ERR_EXIT(x) 		\
+	do { 			\
+		die(x); 	\
+		break; 		\
+	} while (0)
+
+extern int verbose;
+
 enum operation {
 	R_ACTION = 0,
 	R_FNAME,
@@ -25,17 +33,17 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 			 */
 			switch (op) {
 			case R_ACTION:
-				die("Error recieving action");
+				ERR_EXIT("Error recieving action");
 			case R_FNAME:
-				die("Error recieving filename");
+				ERR_EXIT("Error recieving filename");
 			case R_FMODE:
-				die("Error recieving filemode");
+				ERR_EXIT("Error recieving filemode");
 			case R_FCONT:
-				die("Error reading filecontent");
+				ERR_EXIT("Error reading filecontent");
 			case R_COUNT:
-				die("Error recieving file count");
+				ERR_EXIT("Error recieving file count");
 			default:
-				die("Unknown error while reading data");
+				ERR_EXIT("Unknown error while reading data");
 			}
 		}
 		data += rc;

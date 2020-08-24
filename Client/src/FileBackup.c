@@ -1,5 +1,11 @@
 #include "../include/FileBackup.h"
 
+#define FATAL(x) 	\
+	do { 		\
+		die(x); \
+		break; 	\
+	} while (0)
+
 enum operation {
 	S_ACTN = 0,
 	S_FNAME,
@@ -10,10 +16,10 @@ enum operation {
 };
 
 /* Send data through socket. */
-static void send_data(int sockfd, void *data, size_t amt, enum operation op)
+static void send_data(int sockfd, const void *data, size_t amt, enum operation op)
 {
 	int rc;
-	char *byte = data;
+	const char *byte = data;
 
 	if (amt == 0)
 		return;
@@ -23,19 +29,19 @@ static void send_data(int sockfd, void *data, size_t amt, enum operation op)
 		if (rc < 0) {
 			switch (op) {
 			case S_ACTN:
-				die("Error while sending action");
+				FATAL("Error while sending action");
 			case S_FNAME:
-				die("Error while sending filename");
+				FATAL("Error while sending filename");
 			case S_FMODE:
-				die("Error while sending filemode");
+				FATAL("Error while sending filemode");
 			case S_MESSG:
-				die("Error while sending message");
+				FATAL("Error while sending message");
 			case S_FCONT:
-				die("Error while sending file content");
+				FATAL("Error while sending file content");
 			case S_COUNT:
-				die("Error while sending file count");
+				FATAL("Error while sending file count");
 			default:
-				die("Fatal unknown error");;
+				FATAL("Fatal unknown error");
 			}
 		}
 		byte += rc;
@@ -71,7 +77,7 @@ void send_filemode(int sockfd, struct stat *st)
 /* Send arbitrary messsage to the server */
 void send_message(int sockfd, const char *msg, size_t msgsize)
 {
-	send_data(sockfd, (void *) msg, msgsize, S_MESSG);
+	send_data(sockfd, msg, msgsize, S_MESSG);
 }
 
 void send_filecount(int sockfd, unsigned int total)

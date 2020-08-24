@@ -126,7 +126,7 @@ static void begin_backup(int sockfd, const char *path)
 {
 	/* Begin backup with the directory that the program is in */
 	send_filecount(sockfd, totalfilecount);
-	backup_dir(sockfd, ".");
+	backup_dir(sockfd, path);
 
 	/* Send 'E'nd to the server to tell it to stop. */
 	send_action(sockfd, 'E');

@@ -7,8 +7,6 @@
 #include <ftw.h>
 #include "Helper.h"
 
-extern int verbose;
-
 extern int CleanDirectory(const char *path);
 
 #endif /* _CLEANDIRS_H_ */

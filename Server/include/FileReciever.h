@@ -6,8 +6,6 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-extern int verbose;
-
 extern void decipher_message(int sockfd);
 extern void recieve_action(int sockfd, char *ft);
 extern void recieve_filecontent(int sockfd, const char *filename, struct stat *);
