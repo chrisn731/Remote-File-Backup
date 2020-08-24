@@ -5,6 +5,8 @@
  */
 #ifndef HELPER_LINK_H_G
 #define HELPER_LINK_H_G
-extern int verbose;
+
 #include "../../Shared/Helper.h"
+extern int verbose;
+
 #endif /* HELPER_LINK_H_G */
