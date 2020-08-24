@@ -26,6 +26,7 @@ CFLAGS += -Wunreachable-code
 CFLAGS += -Wunused-but-set-parameter
 CFLAGS += -Wwrite-strings
 CFLAGS += -D_DEFAULT_SOURCE
+CFLAGS += -O2
 CHELPR 	= ../Shared/Helper.c
 
 all: quick
