@@ -27,10 +27,6 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 	do {
 		rc = read(sockfd, data, amt);
 		if (rc < 0) {
-			/*
-			 * if we end up here program will exit, so
-			 * breaks are not needed
-			 */
 			switch (op) {
 			case R_ACTION:
 				ERR_EXIT("Error recieving action");

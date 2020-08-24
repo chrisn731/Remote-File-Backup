@@ -21,7 +21,7 @@ static void send_data(int sockfd, const void *data, size_t amt, enum operation o
 	int rc;
 	const char *byte = data;
 
-	if (amt == 0)
+	if (!amt)
 		return;
 
 	do {
@@ -62,7 +62,7 @@ void send_filename(int sockfd, const char *filename)
 
 	zerobuf(buffer, STD_BUFF_SZ);
 	sprintf(buffer, "%s", filename);
-	send_data(sockfd, (void *) buffer, STD_BUFF_SZ, S_FNAME);
+	send_data(sockfd, buffer, STD_BUFF_SZ, S_FNAME);
 }
 
 /* Send filemode to server */
