@@ -3,9 +3,6 @@
 /* Used to supress unused paramater warnings */
 #define UNUSED(x) (void)(x)
 
-extern int verbose;
-
-
 /* For each file passed into this function, it will be deleted */
 static int unlink_cb(const char *fpath, const struct stat *sb,
 		     int typeflag, struct FTW *ftwbuf)

@@ -6,8 +6,6 @@
 		break; 		\
 	} while (0)
 
-extern int verbose;
-
 enum operation {
 	R_ACTION = 0,
 	R_FNAME,
