@@ -7,7 +7,7 @@ int non_verbose_progressbar(int files_backed, int total_files)
 	int barlen = BAR_LENGTH;
 	int hashes;
 
-	if (files_backed <= 0)
+	if (files_backed < 1)
 		hashes = 0;
 	else
 		hashes = barlen * ((float) files_backed / total_files);

@@ -43,7 +43,6 @@ static void print_usage(const char *user_err, ...)
  */
 static int begin_backup(int connfd)
 {
-
 	char buffer[STD_BUFF_SZ];
 	char state;
 	int totalfiles, filesbacked = 0;

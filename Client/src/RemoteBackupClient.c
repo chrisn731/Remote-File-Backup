@@ -61,7 +61,7 @@ static int open_sock(unsigned int port, const char *ip)
  * Function to skip certain filenames while parsing directory.
  * Returns 0 if it is a file to skip, != 0 otherwise.
  */
-static inline int dont_skip(const char *filename)
+static inline int file_to_backup(const char *filename)
 {
 	return (strcmp(filename, ".") &&
 		strcmp(filename, "..") &&
@@ -106,7 +106,7 @@ static void backup_dir(int sockfd, const char *path)
 		v_log("Attempting to backup directory: %s", path);
 
 	while ((de = readdir(dr)) != NULL) {
-		if (dont_skip(de->d_name)) {
+		if (file_to_backup(de->d_name)) {
 			if (de->d_type == DT_DIR) {
 				send_action(sockfd, 'D');
 				send_filename(sockfd, de->d_name);

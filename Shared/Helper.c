@@ -1,6 +1,6 @@
 #include "Helper.h"
 
-/* Prints err to stdout and exits the program. */
+/* Prints err to stderr and exits the program. */
 void die(const char *err, ...)
 {
 	va_list argp;
