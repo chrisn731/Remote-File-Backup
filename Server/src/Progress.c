@@ -4,8 +4,7 @@
 
 int non_verbose_progressbar(int files_backed, int total_files)
 {
-	int barlen = BAR_LENGTH;
-	int hashes;
+	int hashes, barlen = BAR_LENGTH;
 
 	if (files_backed < 1)
 		hashes = 0;
@@ -30,7 +29,6 @@ int non_verbose_progressbar(int files_backed, int total_files)
 		putchar('\r');
 		fflush(stdout);
 	}
-
 	return 0;
 }
 
@@ -42,6 +40,5 @@ int verbose_progressbar(const char *filename, int files_backed, int total_files)
 	printf(" (%d/%d)", files_backed, total_files);
 	printf(" Recieving file: %s...", filename);
 	fflush(stdout);
-
 	return 0;
 }
