@@ -21,10 +21,7 @@ static void send_data(int sockfd, const void *data, size_t amt, enum operation o
 	int rc;
 	const char *byte = data;
 
-	if (!amt)
-		return;
-
-	do {
+	while (amt > 0) {
 		rc = write(sockfd, byte, amt);
 		if (rc < 0) {
 			switch (op) {
@@ -46,7 +43,7 @@ static void send_data(int sockfd, const void *data, size_t amt, enum operation o
 		}
 		byte += rc;
 		amt -= rc;
-	} while (amt > 0);
+	}
 }
 
 /* Sends actions to server to perform. */

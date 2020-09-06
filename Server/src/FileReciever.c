@@ -19,10 +19,7 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 	int rc;
 	char *data = ptr;
 
-	if (!amt)
-		return;
-
-	do {
+	while (amt > 0) {
 		rc = read(sockfd, data, amt);
 		if (rc < 0) {
 			switch (op) {
@@ -42,7 +39,7 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 		}
 		data += rc;
 		amt -= rc;
-	} while (amt > 0);
+	}
 }
 
 void recieve_action(int sockfd, char *ft)
