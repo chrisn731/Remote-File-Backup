@@ -1,4 +1,4 @@
-#include "../include/FileReciever.h"
+#include "../include/FileReceiver.h"
 
 #define ERR_EXIT(x) 		\
 	do { 			\
@@ -24,15 +24,15 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 		if (rc < 0) {
 			switch (op) {
 			case R_ACTION:
-				ERR_EXIT("Error recieving action");
+				ERR_EXIT("Error receiving action");
 			case R_FNAME:
-				ERR_EXIT("Error recieving filename");
+				ERR_EXIT("Error receiving filename");
 			case R_FMODE:
-				ERR_EXIT("Error recieving filemode");
+				ERR_EXIT("Error receiving filemode");
 			case R_FCONT:
-				ERR_EXIT("Error reading filecontent");
+				ERR_EXIT("Error receiving filecontent");
 			case R_COUNT:
-				ERR_EXIT("Error recieving file count");
+				ERR_EXIT("Error receiving file count");
 			default:
 				ERR_EXIT("Unknown error while reading data");
 			}
@@ -42,7 +42,7 @@ static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
 	}
 }
 
-void recieve_action(int sockfd, char *ft)
+void receive_action(int sockfd, char *ft)
 {
 	read_data(sockfd, ft, sizeof(*ft), R_ACTION);
 }
@@ -51,13 +51,13 @@ void recieve_action(int sockfd, char *ft)
  * The buffer passed into this function will ALWAYS
  * point to a size of STD_BUFF_SZ.
  */
-void recieve_filename(int sockfd, char *buffer)
+void receive_filename(int sockfd, char *buffer)
 {
 	zerobuf(buffer, STD_BUFF_SZ);
 	read_data(sockfd, buffer, STD_BUFF_SZ, R_FNAME);
 }
 
-void recieve_filemode(int sockfd, struct stat *st)
+void receive_filemode(int sockfd, struct stat *st)
 {
 	int32_t conv;
 
@@ -65,7 +65,7 @@ void recieve_filemode(int sockfd, struct stat *st)
 	st->st_mode = ntohl(conv);
 }
 
-void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
+void receive_filecontent(int sockfd, const char *filename, struct stat *st)
 {
 	char buffer[STD_BUFF_SZ];
 	FILE *fp;
@@ -90,7 +90,7 @@ void recieve_filecontent(int sockfd, const char *filename, struct stat *st)
 	chmod(filename, st->st_mode);
 }
 
-void recieve_numoffiles(int sockfd, int *total)
+void receive_numoffiles(int sockfd, int *total)
 {
 	int32_t conv;
 

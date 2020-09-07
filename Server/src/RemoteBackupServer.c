@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include "../include/CleanDirs.h"
-#include "../include/FileReciever.h"
+#include "../include/FileReceiver.h"
 #include "../include/Helper.h"
 #include "../include/Progress.h"
 
@@ -48,13 +48,13 @@ static int begin_backup(int connfd)
 	int totalfiles, filesbacked = 0;
 	struct stat st;
 
-	recieve_numoffiles(connfd, &totalfiles);
+	receive_numoffiles(connfd, &totalfiles);
 	while (1) {
-		recieve_action(connfd, &state);
+		receive_action(connfd, &state);
 
 		switch (state) {
 		case 'D':
-			recieve_filename(connfd, buffer);
+			receive_filename(connfd, buffer);
 			if (verbose)
 				v_log("Recieved dir: %s", buffer);
 			mkdir(buffer, 0755);
@@ -62,11 +62,11 @@ static int begin_backup(int connfd)
 			continue;
 
 		case 'F':
-			recieve_filename(connfd, buffer);
+			receive_filename(connfd, buffer);
 			if (verbose)
 				verbose_progressbar(buffer, ++filesbacked, totalfiles);
-			recieve_filemode(connfd, &st);
-			recieve_filecontent(connfd, buffer, &st);
+			receive_filemode(connfd, &st);
+			receive_filecontent(connfd, buffer, &st);
 			if (verbose)
 				printf(" Done.\n");
 			else

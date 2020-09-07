@@ -1,3 +1,5 @@
+all: both
+
 both: client server
 
 client:
@@ -6,3 +8,6 @@ client:
 server:
 	$(MAKE) quick -C Server
 	mv Server/RBServer .
+
+
+.PHONY: client server both all

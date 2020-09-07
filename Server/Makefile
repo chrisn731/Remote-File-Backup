@@ -34,7 +34,7 @@ all: quick
 clean:
 	rm *.o
 
-quick: src/CleanDirs.c src/FileReciever.c src/RemoteBackupServer.c src/Progress.c $(CHELPR)
+quick: src/CleanDirs.c src/FileReceiver.c src/RemoteBackupServer.c src/Progress.c $(CHELPR)
 	$(CC) $(CFLAGS) $^ -o RBServer
 
 .PHONY: all server quick clean
