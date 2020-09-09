@@ -13,7 +13,7 @@
  * If more data throughput is needed,
  * this is the only value needed to be changed.
  */
-#define STD_BUFF_SZ 512
+#define STD_BUFF_SZ 4096
 
 /* Port to be used for Client and Server Socket. */
 #define PORT 8080

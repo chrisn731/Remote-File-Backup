@@ -2,14 +2,14 @@
 
 #define BAR_LENGTH 30
 
-int non_verbose_progressbar(int files_backed, int total_files)
+void non_verbose_progressbar(int files_backed, int total_files)
 {
 	int hashes, barlen = BAR_LENGTH;
 
 	if (files_backed < 1)
 		hashes = 0;
 	else
-		hashes = barlen * ((float) files_backed / total_files);
+		hashes = barlen * ((double) files_backed / total_files);
 
 	fputs(" [", stdout);
 	while (barlen-- != 0) {
@@ -23,22 +23,17 @@ int non_verbose_progressbar(int files_backed, int total_files)
 	putchar(']');
 	printf(" (%d/%d)", files_backed, total_files);
 
-	if (files_backed == total_files) {
-		putchar('\n');
-	} else {
+	if (files_backed != total_files) {
 		putchar('\r');
 		fflush(stdout);
+	} else {
+		putchar('\n');
 	}
-	return 0;
 }
 
-int verbose_progressbar(const char *filename, int files_backed, int total_files)
+void verbose_progressbar(const char *filename, int files_backed, int total_files)
 {
-	if (files_backed <= 0)
-		return 1;
-
 	printf(" (%d/%d)", files_backed, total_files);
 	printf(" Recieving file: %s...", filename);
 	fflush(stdout);
-	return 0;
 }

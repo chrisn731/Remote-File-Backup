@@ -12,15 +12,15 @@ static inline int file_to_count(const char *filename)
  * Function only called in non verbose procedure of program.
  * Output: [###---] (Completed/Total)
  */
-int non_verbose_progressbar(int files_backed, int total_files)
+void non_verbose_progressbar(int files_backed, int total_files)
 {
 	int barlen = BAR_LENGTH;
 	int hashes;
 
-	if (files_backed <= 0)
-		hashes = 0;
+	if (files_backed > 0)
+		hashes = barlen * ((double) files_backed / total_files);
 	else
-		hashes = barlen * ((float) files_backed / total_files);
+		hashes = 0;
 
 	fputs(" [", stdout);
 	while (barlen-- != 0) {
@@ -34,14 +34,12 @@ int non_verbose_progressbar(int files_backed, int total_files)
 	putchar(']');
 	printf(" (%d/%d)", files_backed, total_files);
 
-	if (files_backed == total_files) {
-		putchar('\n');
-	} else {
+	if (files_backed != total_files) {
 		putchar('\r');
 		fflush(stdout);
+	} else {
+		putchar('\n');
 	}
-
-	return 0;
 }
 
 /*
@@ -77,12 +75,15 @@ unsigned int num_of_files(const char *path)
  * Function only called in verbose procedure of program.
  * Output: (File being backed up) [###---] (Percentage Complete)
  */
-int verbose_progressbar(const char *fname, long done, long total)
+void verbose_progressbar(const char *fname, long done, long total)
 {
 	int barlen, hashes, percent_done;
 
 	barlen = BAR_LENGTH;
-	if (done < 1) {
+	if (done > 0) {
+		hashes = barlen * ((float) done / total);
+		percent_done = 100 * ((float) done / total);
+	} else {
 		/* This case will only be triggered for empty files */
 		if (done == total) {
 			hashes = barlen;
@@ -91,9 +92,6 @@ int verbose_progressbar(const char *fname, long done, long total)
 			hashes = 0;
 			percent_done = 0;
 		}
-	} else {
-		hashes = barlen * ((float) done / total);
-		percent_done = 100 * ((float) done / total);
 	}
 
 	printf(" Backing up %-130s\t", fname);
@@ -110,6 +108,4 @@ int verbose_progressbar(const char *fname, long done, long total)
 	printf(" %d%%", percent_done);
 	putchar('\r');
 	fflush(stdout);
-
-	return 0;
 }

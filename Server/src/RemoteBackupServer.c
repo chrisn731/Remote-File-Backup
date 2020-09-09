@@ -82,7 +82,8 @@ static int begin_backup(int connfd)
 			break;
 		case 0:
 		default: /* 0 and default are the error case. */
-			return 1;
+			close(connfd);
+			die("Fatal Error: Recieved bad action from client. Closing.");
 		}
 		break;
 	}
@@ -211,11 +212,7 @@ int main(int argc, char **argv)
 	purge_dir();
 
 	/* At this point we have a clean directory ready for files */
-	if (begin_backup(connfd)) {
-		close(connfd);
-		close(serverfd);
-		die("Fatal Error: Recieved bad action from client. Closing.");
-	}
+	begin_backup(connfd);
 
 	v_log("Backup Complete.");
 
