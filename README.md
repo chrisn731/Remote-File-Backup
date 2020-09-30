@@ -7,6 +7,6 @@ the client and the server. Alternatively, use `make client` or `make server` to
 make either client or server only.
 
 If more data throughput is needed, access the `Shared/Helper.h` and change
-the `STD\_BUFF\_SZ` to a higher number.
+the `STD_BUFF_SZ` to a higher number.
 Similarly, to change the port, simply change the `PORT` to a value of your
 liking. At compile time all necessary values will be set.
