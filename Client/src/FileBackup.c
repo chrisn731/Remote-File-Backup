@@ -58,7 +58,7 @@ void send_filename(int sockfd, const char *filename)
 	char buffer[STD_BUFF_SZ];
 
 	zerobuf(buffer, STD_BUFF_SZ);
-	sprintf(buffer, "%s", filename);
+	memccpy(buffer, filename, 0, STD_BUFF_SZ);
 	send_data(sockfd, buffer, STD_BUFF_SZ, S_FNAME);
 }
 

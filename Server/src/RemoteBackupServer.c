@@ -21,6 +21,12 @@
 /* Used to make sure we dont delete the process during directory cleaning. */
 #define PROG_NAME "RBServer"
 
+struct backup_data {
+	struct stat st;
+	int filesbacked;
+	int totalfiles;
+};
+
 int verbose = 0;
 
 static void print_usage(const char *user_err, ...)
@@ -33,6 +39,27 @@ static void print_usage(const char *user_err, ...)
 		"  -b, -B\tDo a backup\n\n");
 }
 
+static void backup_dir(int connfd, char *buffer)
+{
+	receive_filename(connfd, buffer);
+	if (verbose)
+		v_log("Recieved dir: %s", buffer);
+	mkdir(buffer, 0755);
+	chdir(buffer);
+}
+
+static void backup_file(int connfd, char *buffer, struct backup_data *info)
+{
+	receive_filename(connfd, buffer);
+	if (verbose)
+		verbose_progressbar(buffer, ++info->filesbacked, info->totalfiles);
+	receive_filemode(connfd, &info->st);
+	receive_filecontent(connfd, buffer, &info->st);
+	if (verbose)
+		puts("Done.");
+	else
+		non_verbose_progressbar(++info->filesbacked, info->totalfiles);
+}
 /*
  * Kick off function for backing up. Recieves an action from a client,
  * and performs some action based on it.
@@ -45,32 +72,19 @@ static int begin_backup(int connfd)
 {
 	char buffer[STD_BUFF_SZ];
 	char state;
-	int totalfiles, filesbacked = 0;
-	struct stat st;
+	struct backup_data runtime_info = {0};
 
-	receive_numoffiles(connfd, &totalfiles);
+	receive_numoffiles(connfd, &runtime_info.totalfiles);
 	while (1) {
 		receive_action(connfd, &state);
 
 		switch (state) {
 		case 'D':
-			receive_filename(connfd, buffer);
-			if (verbose)
-				v_log("Recieved dir: %s", buffer);
-			mkdir(buffer, 0755);
-			chdir(buffer);
+			backup_dir(connfd, buffer);
 			continue;
 
 		case 'F':
-			receive_filename(connfd, buffer);
-			if (verbose)
-				verbose_progressbar(buffer, ++filesbacked, totalfiles);
-			receive_filemode(connfd, &st);
-			receive_filecontent(connfd, buffer, &st);
-			if (verbose)
-				printf(" Done.\n");
-			else
-				non_verbose_progressbar(++filesbacked, totalfiles);
+			backup_file(connfd, buffer, &runtime_info);
 			continue;
 
 		case 'R': /* Return up the directory */

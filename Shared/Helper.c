@@ -13,21 +13,6 @@ void die(const char *err, ...)
 	exit(1);
 }
 
-int strcmp(const char *p1, const char *p2)
-{
-	unsigned char c1, c2;
-
-	while (1) {
-		c1 = *p1++;
-		c2 = *p2++;
-		if (c1 != c2)
-			return c1 < c2 ? -1 : 1;
-		if (!c1)
-			break;
-	}
-	return 0;
-}
-
 /* Zero out buffer of a given size */
 void zerobuf(char *buffer, size_t bufsize)
 {

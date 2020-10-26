@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <string.h>
 
 /*
  * The standard buffer size to use across all programs.
@@ -19,7 +20,6 @@
 #define PORT 8080
 
 extern void die(const char *err, ...);
-extern int strcmp(const char *, const char *);
 extern void zerobuf(char *buf, size_t bufsize);
 extern void v_log(const char *msg, ...);
 
