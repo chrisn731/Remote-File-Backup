@@ -95,7 +95,7 @@ void send_filecontent(int sockfd, const char *filename,
 {
 	FILE *fp;
 	int32_t conv;
-	int read;
+	int n_read;
 	char data[STD_BUFF_SZ];
 
 	if (!(fp = fopen(filename, "r")))
@@ -104,14 +104,14 @@ void send_filecontent(int sockfd, const char *filename,
 	do {
 		memset(data, 0, STD_BUFF_SZ);
 
-		read = fread(data, 1, STD_BUFF_SZ, fp);
+		n_read = fread(data, 1, STD_BUFF_SZ, fp);
 		/* Send how much data is to be read */
-		conv = htonl(read);
+		conv = htonl(n_read);
 		send_data(sockfd, &conv, sizeof(conv), S_FCONT);
 
 		/* Send the data */
-		send_data(sockfd, data, read, S_FCONT);
-	} while (read == STD_BUFF_SZ);
+		send_data(sockfd, data, n_read, S_FCONT);
+	} while (n_read == STD_BUFF_SZ);
 	if (fclose(fp))
 		die("Error closing '%s'", filename);
 	/* Update the progress bar for total files backed */
