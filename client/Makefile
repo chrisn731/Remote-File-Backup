@@ -1,4 +1,4 @@
-CC 	= gcc
+CC 	:= gcc
 CFLAGS += -std=c99 -Wpedantic -pedantic-errors
 CFLAGS += -Werror
 CFLAGS += -Wall
@@ -27,14 +27,17 @@ CFLAGS += -Wunused-but-set-parameter
 CFLAGS += -Wwrite-strings
 CFLAGS += -D_DEFAULT_SOURCE
 CFLAGS += -O2
-CHELPR 	= ../Shared/Helper.c
 
-all: quick
+
+CSRC	= src/main.c src/progress.c src/filebackup.c
+HELPERC	= ../shared/helper.c
+
+.PHONY: all clean
+
+all: RBClient
 
 clean:
-	rm *.o
+	rm $(OBJ)/*.o
 
-quick: src/CleanDirs.c src/FileReceiver.c src/RemoteBackupServer.c src/Progress.c $(CHELPR)
-	$(CC) $(CFLAGS) $^ -o RBServer
-
-.PHONY: all server quick clean
+RBClient: $(CSRC) $(HELPERC)
+	$(CC) $(CFLAGS) $^ -o $@

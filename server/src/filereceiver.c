@@ -1,4 +1,13 @@
-#include "../include/FileReceiver.h"
+#include <sys/stat.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "../include/filereceiver.h"
+#include "../include/helper.h"
+#include "../include/main.h"
 
 #define ERR_EXIT(x) 		\
 	do { 			\
@@ -6,7 +15,7 @@
 		break; 		\
 	} while (0)
 
-enum operation {
+enum {
 	R_ACTION = 0,
 	R_FNAME,
 	R_FMODE,
@@ -14,7 +23,7 @@ enum operation {
 	R_COUNT,
 };
 
-static void read_data(int sockfd, void *ptr, size_t amt, enum operation op)
+static void read_data(int sockfd, void *ptr, size_t amt, int op)
 {
 	int rc;
 	char *data = ptr;
@@ -53,30 +62,29 @@ void receive_action(int sockfd, char *ft)
  */
 void receive_filename(int sockfd, char *buffer)
 {
-	zerobuf(buffer, STD_BUFF_SZ);
+	memset(buffer, 0, STD_BUFF_SZ);
 	read_data(sockfd, buffer, STD_BUFF_SZ, R_FNAME);
 }
 
 void receive_filemode(int sockfd, struct stat *st)
 {
 	int32_t conv;
-
 	read_data(sockfd, &conv, sizeof(int32_t), R_FMODE);
 	st->st_mode = ntohl(conv);
 }
 
 void receive_filecontent(int sockfd, const char *filename, struct stat *st)
 {
-	char buffer[STD_BUFF_SZ];
 	FILE *fp;
 	int readamt;
 	int32_t conv;
+	char buffer[STD_BUFF_SZ];
 
 	if (!(fp = fopen(filename, "w")))
 		die("Error opening %s to write to", filename);
 
 	do {
-		zerobuf(buffer, STD_BUFF_SZ);
+		memset(buffer, 0, STD_BUFF_SZ);
 
 		read_data(sockfd, &conv, sizeof(int32_t), R_FCONT);
 
@@ -85,15 +93,14 @@ void receive_filecontent(int sockfd, const char *filename, struct stat *st)
 
 		fwrite(buffer, sizeof(char), readamt, fp);
 	} while (readamt == STD_BUFF_SZ);
-
-	fclose(fp);
+	if (fclose(fp))
+		die("Error closing '%s'", filename);
 	chmod(filename, st->st_mode);
 }
 
 void receive_numoffiles(int sockfd, int *total)
 {
 	int32_t conv;
-
 	read_data(sockfd, &conv, sizeof(int32_t), R_COUNT);
 	*total = ntohl(conv);
 }

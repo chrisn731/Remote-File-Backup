@@ -2,11 +2,6 @@
 #define FILEBACKUP_H_G
 
 #include <sys/stat.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include "Helper.h"
-#include "ProgressBar.h"
 
 extern void send_action(int sockfd, char ft);
 extern void send_filecontent(int sockfd, const char *filename, int, int);

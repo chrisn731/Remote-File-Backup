@@ -1,25 +1,24 @@
-/*
- * Create a network socket and send files through. Similar to scp.
- * One benefit of this over scp is that it will recursively send all
- * types of files through a socket.
- */
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
-#include "../include/Helper.h"
-#include "../include/FileBackup.h"
-#include "../include/ProgressBar.h"
+#include <unistd.h>
+
+#include "../include/helper.h"
+#include "../include/filebackup.h"
+#include "../include/progress.h"
 
 static unsigned int totalfilecount = 0;
 static unsigned int totalfilesbacked = 0;
-int verbose = 0;
+static int verbose = 0;
 
 static void print_usage(const char *user_err)
 {
-	printf("%s\n", user_err);
+	if (user_err)
+		printf("%s\n", user_err);
 	printf("Usage: ./RBClient [FLAGS...]\n\n"
 		" Flags:\n"
 		"  -v, -V\tBe Verbose.\n"
@@ -145,7 +144,6 @@ int main(int argc, char **argv)
 	while ((arg = argv[1]) != NULL) {
 		if (*arg != '-')
 			die("Error caught unknown flag: %s", arg);
-
 		for (;;) {
 			switch (*++arg) {
 			case 'b':
@@ -161,6 +159,10 @@ int main(int argc, char **argv)
 				if (!strcmp("-ip", arg)) {
 					IP = argv[2];
 					argv++;
+				} else if (!strcmp("-help", arg)) {
+					print_usage(NULL);
+				} else {
+					die("Unknown flag: %s", arg);
 				}
 				break;
 			case 0:
@@ -180,12 +182,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	sockfd = open_sock(PORT, IP);
-	totalfilecount = num_of_files(".");
-
+	if ((totalfilecount = num_of_files(".")) <= 0)
+		die("No files found to backup.");
 	printf("Beginning Backup...\n");
 	begin_backup(sockfd, ".");
 	printf("Backup complete.\n");
-
 	close(sockfd);
 	return 0;
 }

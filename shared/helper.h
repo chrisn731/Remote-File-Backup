@@ -1,12 +1,7 @@
 #ifndef HELPER_H_G
 #define HELPER_H_G
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <string.h>
-
+#include <stdlib.h> /* size_t */
 /*
  * The standard buffer size to use across all programs.
  * This helps regulate how much data should be read and wrote
@@ -22,6 +17,5 @@
 extern void die(const char *err, ...);
 extern void zerobuf(char *buf, size_t bufsize);
 extern void v_log(const char *msg, ...);
-
 
 #endif /* HELPER_H_G */

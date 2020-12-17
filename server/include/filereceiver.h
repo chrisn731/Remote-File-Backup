@@ -1,10 +1,7 @@
 #ifndef FILERECEIVER_H_G
 #define FILERECEIVER_H_G
 
-#include "Helper.h"
-#include <sys/stat.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
+#include <sys/stat.h> /* struct stat */
 
 extern void receive_action(int sockfd, char *ft);
 extern void receive_filecontent(int sockfd, const char *filename, struct stat *);

@@ -9,14 +9,18 @@
  */
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <dirent.h>
-#include "../include/CleanDirs.h"
-#include "../include/FileReceiver.h"
-#include "../include/Helper.h"
-#include "../include/Progress.h"
+
+#include "../include/cleandirs.h"
+#include "../include/filereceiver.h"
+#include "../include/helper.h"
+#include "../include/main.h"
+#include "../include/progress.h"
 
 /* Used to make sure we dont delete the process during directory cleaning. */
 #define PROG_NAME "RBServer"

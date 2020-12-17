@@ -1,4 +1,11 @@
-#include "../include/CleanDirs.h"
+/* Needed to access nftw function */
+#define _XOPEN_SOURCE 500
+#include <ftw.h>
+#include <stdio.h>
+
+#include "../include/cleandirs.h"
+#include "../include/helper.h"
+#include "../include/main.h"
 
 /* Used to supress unused paramater warnings */
 #define UNUSED(x) (void)(x)
@@ -14,10 +21,8 @@ static int unlink_cb(const char *fpath, const struct stat *sb,
 
 	if (verbose)
 		v_log("Attempting to remove: %s", fpath);
-
 	if ((rv = remove(fpath)))
 		die("Error removing: %s", fpath);
-
 	return rv;
 }
 
@@ -29,8 +34,6 @@ int CleanDirectory(const char *path)
 {
 	if (verbose)
 		v_log("Attempting to delete dir: %s", path);
-
 	nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
-
 	return 0;
 }

@@ -1,4 +1,9 @@
-#include "../include/Progress.h"
+#include <dirent.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+#include "../include/progress.h"
+#include "../include/main.h"
 
 #define BAR_LENGTH 30
 
