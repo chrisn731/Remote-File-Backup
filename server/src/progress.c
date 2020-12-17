@@ -1,6 +1,4 @@
-#include <dirent.h>
 #include <stdio.h>
-#include <sys/stat.h>
 
 #include "../include/progress.h"
 #include "../include/main.h"

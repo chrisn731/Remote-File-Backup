@@ -1,9 +1,7 @@
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #include "../include/filebackup.h"
 #include "../include/helper.h"
